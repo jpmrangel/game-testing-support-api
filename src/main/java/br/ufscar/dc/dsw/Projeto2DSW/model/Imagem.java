@@ -13,4 +13,28 @@ public class Imagem {
     @ManyToOne
     @JoinColumn(name = "estrategia_id")
     private Estrategia estrategia;
+
+    public Long getId_imagem() {
+        return id_imagem;
+    }
+
+    public void setId_imagem(Long id_imagem) {
+        this.id_imagem = id_imagem;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public Estrategia getEstrategia() {
+        return estrategia;
+    }
+
+    public void setEstrategia(Estrategia estrategia) {
+        this.estrategia = estrategia;
+    }
 }

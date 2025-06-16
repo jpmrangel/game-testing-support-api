@@ -36,4 +36,84 @@ public class SessaoTeste {
 
     @OneToMany(mappedBy = "sessao")
     private List<Bug> bugs;
+
+    public Long getId_sessao() {
+        return id_sessao;
+    }
+
+    public void setId_sessao(Long id_sessao) {
+        this.id_sessao = id_sessao;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public String getNome_testador() {
+        return nome_testador;
+    }
+
+    public void setNome_testador(String nome_testador) {
+        this.nome_testador = nome_testador;
+    }
+
+    public int getTempo() {
+        return tempo;
+    }
+
+    public void setTempo(int tempo) {
+        this.tempo = tempo;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public Timestamp getData_criacao() {
+        return data_criacao;
+    }
+
+    public void setData_criacao(Timestamp data_criacao) {
+        this.data_criacao = data_criacao;
+    }
+
+    public Estrategia getEstrategia() {
+        return estrategia;
+    }
+
+    public void setEstrategia(Estrategia estrategia) {
+        this.estrategia = estrategia;
+    }
+
+    public Projeto getProjeto() {
+        return projeto;
+    }
+
+    public void setProjeto(Projeto projeto) {
+        this.projeto = projeto;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public List<Bug> getBugs() {
+        return bugs;
+    }
+
+    public void setBugs(List<Bug> bugs) {
+        this.bugs = bugs;
+    }
 }

@@ -20,4 +20,44 @@ public class Projeto {
 
     @OneToMany(mappedBy = "projeto")
     private List<SessaoTeste> sessoes;
+
+    public Long getId_projeto() {
+        return id_projeto;
+    }
+
+    public void setId_projeto(Long id_projeto) {
+        this.id_projeto = id_projeto;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public Timestamp getData_criacao() {
+        return data_criacao;
+    }
+
+    public void setData_criacao(Timestamp data_criacao) {
+        this.data_criacao = data_criacao;
+    }
+
+    public List<SessaoTeste> getSessoes() {
+        return sessoes;
+    }
+
+    public void setSessoes(List<SessaoTeste> sessoes) {
+        this.sessoes = sessoes;
+    }
 }
