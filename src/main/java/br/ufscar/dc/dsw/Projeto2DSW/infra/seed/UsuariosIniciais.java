@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 
 @Component
-public class AdminInicial implements CommandLineRunner {
+public class UsuariosIniciais implements CommandLineRunner {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -31,7 +31,21 @@ public class AdminInicial implements CommandLineRunner {
             admin.setData_criacao(new Timestamp(System.currentTimeMillis()));
 
             usuarioRepository.save(admin);
-            System.out.println("Usuário administrador criado com sucesso: " + admin.getEmail());
+            System.out.println("Usuário testador criado com sucesso: " + admin.getEmail());
+        } else {
+            System.out.println("Usuário testador já existe.");
+        }
+
+        if (usuarioRepository.findByEmail("testador@teste.com") == null) {
+            Usuario testador = new Usuario();
+            testador.setNome("Testador");
+            testador.setEmail("testador@teste.com");
+            testador.setSenha(passwordEncoder.encode("testador"));
+            testador.setPapel(Papel.TESTADOR);
+            testador.setData_criacao(new Timestamp(System.currentTimeMillis()));
+
+            usuarioRepository.save(testador);
+            System.out.println("Usuário administrador criado com sucesso: " + testador.getEmail());
         } else {
             System.out.println("Usuário administrador já existe.");
         }
