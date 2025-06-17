@@ -8,6 +8,7 @@ public class Imagem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_imagem;
 
+    @Column(nullable = false)
     private String url;
 
     @ManyToOne
