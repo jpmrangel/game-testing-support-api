@@ -9,11 +9,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 @RequestMapping("/admin/projetos")
-public class ProjetoController {
+public class ProjetoAdminController {
 
     @Autowired
     private ProjetoRepository projetoRepository;
@@ -26,7 +27,8 @@ public class ProjetoController {
     }
 
     @GetMapping("/listar-projetos")
-    public String listarProjetos() {
+    public String listarProjetos(Model model) {
+        model.addAttribute("projetos", projetoRepository.findAll());
         return "admin/projetos/listar-projetos";
     }
 
@@ -43,6 +45,38 @@ public class ProjetoController {
         projeto.setUsuarios(usuariosDisponiveis);
 
         projetoRepository.save(projeto);
+        return "redirect:/admin/projetos/listar-projetos";
+    }
+
+    @GetMapping("/editar/{id}")
+    public String editarProjeto(@PathVariable("id") Long id, Model model) {
+        Projeto projeto = projetoRepository.findById(id).orElseThrow();
+        model.addAttribute("projeto", projeto);
+        model.addAttribute("usuariosDisponiveis", usuarioRepository.findAll());
+        return "admin/projetos/editar-projeto";
+    }
+
+    @PostMapping("/editar/{id}")
+    public String editarProjeto(@PathVariable Long id, Projeto projeto, @RequestParam(required = false) List<Long> usuarios) {
+        Projeto projetoOriginal = projetoRepository.findById(id).orElseThrow();
+
+        projetoOriginal.setNome(projeto.getNome());
+        projetoOriginal.setDescricao(projeto.getDescricao());
+
+        if(usuarios != null) {
+            List<Usuario> usuariosDisponiveis = usuarioRepository.findAllById(usuarios);
+            projetoOriginal.setUsuarios(usuariosDisponiveis);
+        } else {
+            projetoOriginal.setUsuarios(new ArrayList<>());
+        }
+
+        projetoRepository.save(projetoOriginal);
+        return "redirect:/admin/projetos/listar-projetos";
+    }
+
+    @PostMapping("/excluir/{id}")
+    public String excluirProjeto(@PathVariable Long id) {
+        projetoRepository.deleteById(id);
         return "redirect:/admin/projetos/listar-projetos";
     }
 }

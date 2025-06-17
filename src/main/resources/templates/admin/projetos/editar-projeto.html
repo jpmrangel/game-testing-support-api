@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Projeto</title>
+</head>
+<body>
+
+<h1>Editar Projeto</h1>
+
+<form th:action="@{'/admin/projetos/editar/' + ${projeto.id_projeto}}" th:object="${projeto}" method="post">
+
+    <label for="nome">Nome:</label><br>
+    <input type="text" id="nome" th:field="*{nome}" /><br><br>
+
+    <label for="descricao">Descrição:</label><br>
+    <textarea id="descricao" th:field="*{descricao}" rows="4" cols="50"></textarea><br><br>
+
+    <label>Membros Permitidos:</label><br>
+    <div th:each="usuario : ${usuariosDisponiveis}">
+        <label>
+            <input type="checkbox" name="usuarios" th:value="${usuario.id_usuario}"
+                   th:checked="${#lists.contains(projeto.usuarios, usuario)}" />
+            <span th:text="${usuario.nome}">Nome do Usuário</span>
+        </label><br>
+    </div><br>
+
+    <button type="submit">Salvar</button>
+    <a th:href="@{/admin/projetos/listar-projetos}"><button type="button">Cancelar</button></a>
+
+</form>
+
+</body>
+</html>

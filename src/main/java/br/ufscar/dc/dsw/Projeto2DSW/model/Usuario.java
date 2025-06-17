@@ -15,7 +15,8 @@ public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_usuario;
+    @Column(name = "id_usuario")
+    private Long idUsuario;
 
     @Column(nullable = false)
     private String nome;
@@ -39,11 +40,11 @@ public class Usuario implements UserDetails {
     private List<Projeto> projetos;
 
     public Long getId_usuario() {
-        return id_usuario;
+        return idUsuario;
     }
 
     public void setId_usuario(Long id_usuario) {
-        this.id_usuario = id_usuario;
+        this.idUsuario = id_usuario;
     }
 
     public String getNome() {
