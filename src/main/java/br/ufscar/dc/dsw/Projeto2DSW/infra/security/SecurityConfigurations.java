@@ -1,5 +1,6 @@
 package br.ufscar.dc.dsw.Projeto2DSW.infra.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,20 +18,25 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfigurations {
 
+    @Autowired
+    private CustomAuthenticationSuccessHandler sucessHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(HttpMethod.GET, "/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
+
+                        .requestMatchers("/admin/**").hasRole("ADMINISTRADOR")
+                        .requestMatchers("/testador/**").hasRole("TESTADOR")
 
                         .requestMatchers(HttpMethod.POST, "/projetos").hasRole("ADMINISTRADOR")
                         .anyRequest().authenticated()
                 )
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
-                        .defaultSuccessUrl("/perfil")
+                        .successHandler(sucessHandler)
                         .permitAll()
                 )
                 .logout(logout -> logout
