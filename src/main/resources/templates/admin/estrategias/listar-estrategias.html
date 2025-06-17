@@ -15,7 +15,7 @@
         <th>Descrição</th>
         <th>Exemplo</th>
         <th>Dica</th>
-        <th>Data de Criação</th>
+        <th>Imagens</th>
         <th>Ações</th>
     </tr>
     </thead>
@@ -25,7 +25,11 @@
         <td th:text="${estrategia.descricao}">Descrição</td>
         <td th:text="${estrategia.exemplo}">Exemplo</td>
         <td th:text="${estrategia.dica}">Dica</td>
-        <td th:text="${#dates.format(estrategia.data_criacao, 'dd/MM/yyyy HH:mm')}">Data</td>
+        <td>
+            <div th:each="img : ${estrategia.imagens}">
+                <img th:src="${img.url}" alt="Imagem" style="max-height: 50px; margin: 2px;" />
+            </div>
+        </td>
         <td>
             <a th:href="@{'/admin/estrategias/editar/' + ${estrategia.id_estrategia}}">
                 <button>Editar</button>

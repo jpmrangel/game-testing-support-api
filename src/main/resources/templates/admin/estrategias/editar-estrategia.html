@@ -22,10 +22,40 @@
     <label for="dica">Dica:</label><br>
     <textarea id="dica" th:field="*{dica}" rows="3" cols="50" required></textarea><br><br>
 
+    <label>Imagens atuais:</label><br>
+    <div>
+        <div th:each="img : ${estrategia.imagens}">
+            <img th:src="${img.url}" alt="Imagem" style="max-height: 100px; margin: 5px;" />
+            <label>
+                <input type="checkbox" name="imagensParaExcluir" th:value="${img.id_imagem}" />
+                Excluir
+            </label>
+        </div>
+    </div>
+    <br>
+
+    <label>Adicionar novas URLs de imagens:</label><br>
+    <div id="imagens-container">
+        <input type="text" name="imagensUrls" placeholder="URL da imagem" /><br>
+    </div>
+    <button type="button" onclick="adicionarCampo()">Adicionar mais uma imagem</button><br><br>
+
     <button type="submit">Salvar</button>
     <a th:href="@{/admin/estrategias/listar-estrategias}"><button type="button">Cancelar</button></a>
 
 </form>
+
+<script>
+    function adicionarCampo() {
+        const container = document.getElementById('imagens-container');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'imagensUrls';
+        input.placeholder = 'URL da imagem';
+        container.appendChild(input);
+        container.appendChild(document.createElement('br'));
+    }
+</script>
 
 </body>
 </html>

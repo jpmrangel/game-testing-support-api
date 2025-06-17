@@ -15,6 +15,12 @@ public class Imagem {
     @JoinColumn(name = "estrategia_id")
     private Estrategia estrategia;
 
+    public Imagem() {}
+
+    public Imagem(String url) {
+        this.url = url;
+    }
+
     public Long getId_imagem() {
         return id_imagem;
     }
