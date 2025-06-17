@@ -35,6 +35,9 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario")
     private List<SessaoTeste> sessoes;
 
+    @ManyToMany(mappedBy = "usuarios")
+    private List<Projeto> projetos;
+
     public Long getId_usuario() {
         return id_usuario;
     }
@@ -89,6 +92,14 @@ public class Usuario implements UserDetails {
 
     public void setSessoes(List<SessaoTeste> sessoes) {
         this.sessoes = sessoes;
+    }
+
+    public List<Projeto> getProjetos() {
+        return projetos;
+    }
+
+    public void setProjetos(List<Projeto> projetos) {
+        this.projetos = projetos;
     }
 
     @Override

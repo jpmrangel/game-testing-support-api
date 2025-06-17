@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Testador - Home</title>
+</head>
+<body>
+<h1>Bem-vindo, Testador!</h1>
+
+<p>Visualize aqui os projetos que você está testando.</p>
+
+<ul>
+    <li><a th:href="@{/testador/projetos}">Projetos Atribuídos</a></li>
+    <li><a th:href="@{/logout}">Sair</a></li>
+</ul>
+</body>
+</html>
