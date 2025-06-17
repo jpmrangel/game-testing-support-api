@@ -24,6 +24,15 @@ public class Projeto {
     @OneToMany(mappedBy = "projeto")
     private List<SessaoTeste> sessoes;
 
+    @ManyToMany
+    @JoinTable(
+            name = "projeto_usuarios",
+            joinColumns = @JoinColumn(name = "projeto_id"),
+            inverseJoinColumns = @JoinColumn(name = "usuario_id")
+
+    )
+    private List<Usuario> usuarios;
+
     public Long getId_projeto() {
         return id_projeto;
     }
@@ -62,5 +71,13 @@ public class Projeto {
 
     public void setSessoes(List<SessaoTeste> sessoes) {
         this.sessoes = sessoes;
+    }
+
+    public List<Usuario> getUsuarios() {
+        return usuarios;
+    }
+
+    public void setUsuarios(List<Usuario> usuarios) {
+        this.usuarios = usuarios;
     }
 }

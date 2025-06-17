@@ -26,7 +26,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             String authority = grantedAuthority.getAuthority();
 
             if (authority.equals("ROLE_ADMINISTRADOR")) {
-                url += "/administrador/home";
+                url += "/admin/home";
                 break;
             } else if (authority.equals("ROLE_TESTADOR")) {
                 url += "/testador/home";

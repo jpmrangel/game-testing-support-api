@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciamento de Projetos</title>
+</head>
+<body>
+
+<h1>Gerenciamento de Projetos</h1>
+
+<div>
+    <a th:href="@{/admin/projetos/listar-projetos}">
+        <button>Listar/editar Projetos</button>
+    </a>
+
+    <a th:href="@{/admin/projetos/novo-projeto}">
+        <button>Criar Novo Projeto</button>
+    </a>
+
+    <a th:href="@{/admin/home}">
+        <button>Voltar para Home</button>
+    </a>
+</div>
+
+</body>
+</html>
