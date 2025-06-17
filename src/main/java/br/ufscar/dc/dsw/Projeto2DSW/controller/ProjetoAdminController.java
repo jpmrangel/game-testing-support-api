@@ -4,9 +4,7 @@ import br.ufscar.dc.dsw.Projeto2DSW.model.Projeto;
 import br.ufscar.dc.dsw.Projeto2DSW.model.Usuario;
 import br.ufscar.dc.dsw.Projeto2DSW.repository.ProjetoRepository;
 import br.ufscar.dc.dsw.Projeto2DSW.repository.UsuarioRepository;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +14,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin/projetos")
-public class ProjetoController {
+public class ProjetoAdminController {
 
     @Autowired
     private ProjetoRepository projetoRepository;
