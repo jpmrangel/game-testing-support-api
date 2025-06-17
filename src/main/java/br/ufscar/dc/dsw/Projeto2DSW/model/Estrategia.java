@@ -10,9 +10,16 @@ public class Estrategia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_estrategia;
 
+    @Column(nullable = false)
     private String nome;
+
+    @Column(nullable = false)
     private String descricao;
+
+    @Column(nullable = false)
     private String exemplo;
+
+    @Column(nullable = false)
     private String dica;
 
     @OneToMany(mappedBy = "estrategia")

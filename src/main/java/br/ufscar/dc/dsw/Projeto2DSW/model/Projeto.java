@@ -12,7 +12,10 @@ public class Projeto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_projeto;
 
+    @Column(nullable = false, unique = true)
     private String nome;
+
+    @Column(nullable = false)
     private String descricao;
 
     @CreationTimestamp

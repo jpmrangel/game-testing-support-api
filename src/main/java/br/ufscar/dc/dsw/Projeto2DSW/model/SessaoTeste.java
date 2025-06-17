@@ -12,8 +12,13 @@ public class SessaoTeste {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_sessao;
 
+    @Column(nullable = false)
     private String descricao;
+
+    @Column(nullable = false)
     private String nome_testador;
+
+    @Column(nullable = false)
     private int tempo;
 
     @Enumerated(EnumType.STRING)

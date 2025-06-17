@@ -11,6 +11,7 @@ public class Bug {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_bug;
 
+    @Column(nullable = false)
     private String descricao;
 
     @CreationTimestamp
