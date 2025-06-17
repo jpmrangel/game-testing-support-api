@@ -8,7 +8,8 @@ import java.util.List;
 public class Estrategia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_estrategia;
+    @Column(name = "id_estrategia")
+    private Long idEstrategia;
 
     @Column(nullable = false)
     private String nome;
@@ -29,11 +30,11 @@ public class Estrategia {
     private List<Imagem> imagens;
 
     public Long getId_estrategia() {
-        return id_estrategia;
+        return idEstrategia;
     }
 
     public void setId_estrategia(Long id_estrategia) {
-        this.id_estrategia = id_estrategia;
+        this.idEstrategia = id_estrategia;
     }
 
     public String getNome() {

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Listar Estratégias</title>
+</head>
+<body>
+
+<h1>Estratégias Cadastradas</h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Nome</th>
+        <th>Descrição</th>
+        <th>Exemplo</th>
+        <th>Dica</th>
+        <th>Imagens</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="estrategia : ${estrategias}">
+        <td th:text="${estrategia.nome}">Nome</td>
+        <td th:text="${estrategia.descricao}">Descrição</td>
+        <td th:text="${estrategia.exemplo}">Exemplo</td>
+        <td th:text="${estrategia.dica}">Dica</td>
+        <td>
+            <div th:each="img : ${estrategia.imagens}">
+                <img th:src="${img.url}" alt="Imagem" style="max-height: 50px; margin: 2px;" />
+            </div>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<a th:href="@{/login}"><button>Fazer Login</button></a>
+
+</body>
+</html>
