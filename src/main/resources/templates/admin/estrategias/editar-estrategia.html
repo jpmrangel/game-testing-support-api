@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Editar Estratégia</title>
+</head>
+<body>
+
+<h1>Editar Estratégia</h1>
+
+<form th:action="@{'/admin/estrategias/editar/' + ${estrategia.id_estrategia}}" th:object="${estrategia}" method="post">
+
+    <label for="nome">Nome:</label><br>
+    <input type="text" id="nome" th:field="*{nome}" required /><br><br>
+
+    <label for="descricao">Descrição:</label><br>
+    <textarea id="descricao" th:field="*{descricao}" rows="4" cols="50" required></textarea><br><br>
+
+    <label for="exemplo">Exemplo:</label><br>
+    <textarea id="exemplo" th:field="*{exemplo}" rows="4" cols="50" required></textarea><br><br>
+
+    <label for="dica">Dica:</label><br>
+    <textarea id="dica" th:field="*{dica}" rows="3" cols="50" required></textarea><br><br>
+
+    <button type="submit">Salvar</button>
+    <a th:href="@{/admin/estrategias/listar-estrategias}"><button type="button">Cancelar</button></a>
+
+</form>
+
+</body>
+</html>

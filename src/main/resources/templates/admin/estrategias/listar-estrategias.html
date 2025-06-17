@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Listar Estratégias</title>
+</head>
+<body>
+
+<h1>Estratégias Cadastradas</h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Nome</th>
+        <th>Descrição</th>
+        <th>Exemplo</th>
+        <th>Dica</th>
+        <th>Data de Criação</th>
+        <th>Ações</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="estrategia : ${estrategias}">
+        <td th:text="${estrategia.nome}">Nome</td>
+        <td th:text="${estrategia.descricao}">Descrição</td>
+        <td th:text="${estrategia.exemplo}">Exemplo</td>
+        <td th:text="${estrategia.dica}">Dica</td>
+        <td th:text="${#dates.format(estrategia.data_criacao, 'dd/MM/yyyy HH:mm')}">Data</td>
+        <td>
+            <a th:href="@{'/admin/estrategias/editar/' + ${estrategia.id_estrategia}}">
+                <button>Editar</button>
+            </a>
+
+            <form th:action="@{'/admin/estrategias/excluir/' + ${estrategia.id_estrategia}}" method="post" style="display:inline;">
+                <button type="submit" onclick="return confirm('Tem certeza que deseja excluir esta estratégia?');">Excluir</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<a th:href="@{/admin/estrategias}"><button>Voltar</button></a>
+
+</body>
+</html>
