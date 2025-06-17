@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Listar Projetos</title>
+</head>
+<body>
+
+<h1>Projetos Cadastrados</h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Nome</th>
+        <th>Descrição</th>
+        <th>Data de Criação</th>
+        <th>Membros</th>
+        <th>Ações</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="projeto : ${projetos}">
+        <td th:text="${projeto.nome}">Nome</td>
+        <td th:text="${projeto.descricao}">Descrição</td>
+        <td th:text="${#dates.format(projeto.data_criacao, 'dd/MM/yyyy HH:mm')}">Data</td>
+        <td>
+            <ul>
+                <li th:each="usuario : ${projeto.usuarios}" th:text="${usuario.nome}"></li>
+            </ul>
+        </td>
+        <td>
+            <a th:href="@{'/admin/projetos/editar/' + ${projeto.id_projeto}}">
+                <button>Editar</button>
+            </a>
+
+            <form th:action="@{'/admin/projetos/excluir/' + ${projeto.id_projeto}}" method="post" style="display:inline;">
+                <button type="submit" onclick="return confirm('Tem certeza que deseja excluir este projeto?');">Excluir</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<a th:href="@{/admin/projetos}"><button>Voltar</button></a>
+
+</body>
+</html>
