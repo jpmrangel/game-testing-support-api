@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="|Sessão: ${sessao.projeto.nome}|">Detalhes da Sessão</title>
+</head>
+<body>
+<h1>Sessão de Teste: <span th:text="${sessao.projeto.nome}"></span></h1>
+<p><strong>Status:</strong> <span th:text="${sessao.status}"></span></p>
+
+<div th:if="${sessao.status.name() == 'EM_EXECUCAO'}">
+    <hr>
+    <h2>Sessão em Andamento</h2>
+    <p><strong>Tempo Restante:</strong> <span id="timer" th:data-duracao-minutos="${sessao.tempo}" th:data-inicio-millis="${sessao.dataInicio.getTime()}">--:--</span></p>
+
+    <div style="background-color:#f0f0f0; padding: 10px; border: 1px solid #ccc;">
+        <h3>Estratégia Aplicada: <span th:text="${sessao.estrategia.nome}"></span></h3>
+        <p><strong>Descrição:</strong> <span th:text="${sessao.estrategia.descricao}"></span></p>
+        <p><strong>Dicas:</strong> <span th:text="${sessao.estrategia.dicas}"></span></p>
+    </div>
+
+    <br/>
+    <form th:action="@{/testador/sessoes/{id}/finalizar(id=${sessao.id})}" method="post" style="display:inline;">
+        <button type="submit">Finalizar Sessão Manualmente</button>
+    </form>
+    <hr>
+
+    <h4>Registrar Bug Encontrado</h4>
+    <form th:action="@{/testador/sessoes/{id}/bugs(id=${sessao.id})}" th:object="${bugDTO}" method="post">
+        <div>
+            <label for="bugDescricao">Descrição do Bug:</label><br/>
+            <textarea id="bugDescricao" th:field="*{descricao}" rows="5" cols="80" required></textarea>
+        </div>
+        <div>
+            <label for="screenshot">Screenshot (opcional):</label>
+            <input type="file" id="screenshot" name="screenshotFile" />
+        </div>
+        <button type="submit">Registrar Bug</button>
+    </form>
+
+    <h4>Bugs Registrados Nesta Sessão:</h4>
+</div>
+
+<div th:if="${sessao.status.name() == 'FINALIZADO'}">
+</div>
+
+<a th:href="@{/testador/sessoes}">Voltar para a lista</a>
+
+<script th:if="${sessao.status.name() == 'EM_EXECUCAO'}">
+    // JavaScript para o timer, como na resposta anterior
+</script>
+</body>
+</html>

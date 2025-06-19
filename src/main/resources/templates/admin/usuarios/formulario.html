@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${usuarioDTO.id == null} ? 'Novo Usuário' : 'Editar Usuário'">Formulário de Usuário</title>
+</head>
+<body>
+<h1 th:text="${usuarioDTO.id == null} ? 'Cadastro de Novo Usuário' : 'Edição de Usuário'"></h1>
+
+<form th:action="@{/admin/usuarios/salvar}" th:object="${usuarioDTO}" method="post">
+
+  <input type="hidden" th:field="*{id}" />
+
+  <div>
+    <label for="name" th:text="#{user.name}">Nome:</label>
+    <input type="text" id="name" th:field="*{name}" required />
+    <span style="color:red;" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+  </div>
+  <div>
+    <label for="email" th:text="#{user.email}">E-mail:</label>
+    <input type="email" id="email" th:field="*{email}" required />
+    <span style="color:red;" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+  </div>
+  <div>
+    <label for="password" th:text="#{user.password}">Senha:</label>
+    <input type="password" id="password" th:field="*{password}" th:required="${usuarioDTO.id == null}" />
+    <span style="color:red;" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+  </div>
+  <div>
+    <label for="papel" th:text="#{user.role}">Papel:</label>
+    <select id="papel" th:field="*{papel}" required>
+      <option value="">Selecione...</option>
+      <option th:each="p : ${T(br.ufscar.dc.dsw.Projeto2DSW.model.Papel).values()}"
+              th:value="${p}"
+              th:text="${p.name()}"></option>
+    </select>
+    <span style="color:red;" th:if="${#fields.hasErrors('papel')}" th:errors="*{papel}"></span>
+  </div>
+
+  <br/>
+  <button type="submit" th:text="#{form.save}">Salvar</button>
+  <a th:href="@{/admin/usuarios}" th:text="#{form.cancel}">Cancelar</a>
+</form>
+</body>
+</html>
