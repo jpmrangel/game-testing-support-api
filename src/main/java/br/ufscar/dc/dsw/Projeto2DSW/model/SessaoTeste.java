@@ -121,4 +121,8 @@ public class SessaoTeste {
     public void setBugs(List<Bug> bugs) {
         this.bugs = bugs;
     }
+
+    public void setTestador(Testador user) {
+
+    }
 }
