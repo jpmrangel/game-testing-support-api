@@ -1,58 +1,83 @@
 package br.ufscar.dc.dsw.Projeto2DSW.controller;
 
-import br.ufscar.dc.dsw.Projeto2DSW.dto.UsuarioDTO;
 import br.ufscar.dc.dsw.Projeto2DSW.model.Papel;
+import br.ufscar.dc.dsw.Projeto2DSW.model.Usuario;
 import br.ufscar.dc.dsw.Projeto2DSW.service.UserService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/admin/usuarios")
 public class AdminController {
 
     @Autowired
-    private UserService userService;
+    private UserService usuarioService;
 
-    @GetMapping("/usuarios")
-    public String listarUsuarios(Model model) {
-        model.addAttribute("listaAdmins", userService.findUsersByRole(Papel.ADMINISTRADOR));
-        model.addAttribute("listaTesters", userService.findUsersByRole(Papel.TESTADOR));
-        return "admin/usuarios/lista";
+
+    @GetMapping("/novo-admin")
+    public String novoAdmin(Model model) {
+        model.addAttribute("usuario", new Usuario());
+        return "admin/usuarios/formAdmin";
     }
 
-    @GetMapping("/usuarios/cadastrar")
-    public String exibirFormularioCadastro(Model model) {
-        model.addAttribute("usuarioDTO", new UsuarioDTO());
-        return "admin/usuarios/formulario";
+
+    @GetMapping("/novo-testador")
+    public String novoTestador(Model model) {
+        model.addAttribute("usuario", new Usuario());
+        return "admin/usuarios/formTestador";
     }
 
-    @PostMapping("/usuarios/salvar")
-    public String salvarUsuario(@Valid @ModelAttribute("usuarioDTO") UsuarioDTO usuarioDTO,
-                                BindingResult result, RedirectAttributes attr) {
-        if (result.hasErrors()) {
-            return "admin/usuarios/formulario";
-        }
+    @PostMapping("/salvar-admin")
+    public String salvarAdmin(@ModelAttribute Usuario usuario) {
+        usuario.setPapel(Papel.ADMINISTRADOR);
+        usuarioService.salvar(usuario);
+        return "redirect:/admin/usuarios/admins";
+    }
 
-        try {
-            userService.criarUsuario(usuarioDTO);
-            attr.addFlashAttribute("sucesso", "Usuário salvo com sucesso!");
-        } catch (IllegalArgumentException e) {
-            attr.addFlashAttribute("erro", e.getMessage());
+
+    @PostMapping("/salvar-testador")
+    public String salvarTestador(@ModelAttribute Usuario usuario) {
+        usuario.setPapel(Papel.TESTADOR);
+        usuarioService.salvar(usuario);
+        return "redirect:/admin/usuarios/testadores";
+    }
+
+
+    @GetMapping("/editar/{id}")
+    public String editarUsuario(@PathVariable Long id, Model model) {
+        Usuario usuario = usuarioService.buscarPorId(id);
+        if (usuario != null) {
+            model.addAttribute("usuario", usuario);
+            if (usuario.getPapel() == Papel.ADMINISTRADOR) {
+                return "admin/usuarios/formAdmin";
+            } else {
+                return "admin/usuarios/formTestador";
+            }
         }
         return "redirect:/admin/usuarios";
     }
-    @GetMapping("/usuarios/remover/{id}")
-    public String removerUsuario(@PathVariable("id") Long id, RedirectAttributes attr) {
-        try {
-            userService.deleteUser(id);
-            attr.addFlashAttribute("sucesso", "Usuário removido com sucesso.");
-        } catch (Exception e) {
-            attr.addFlashAttribute("erro", "Não foi possível remover o usuário.");
+
+    @PostMapping("/atualizar")
+    public String atualizarUsuario(@ModelAttribute Usuario usuario) {
+        usuarioService.salvar(usuario);
+        if (usuario.getPapel() == Papel.ADMINISTRADOR) {
+            return "redirect:/admin/usuarios/admins";
+        } else {
+            return "redirect:/admin/usuarios/testadores";
+        }
+    }
+
+    @GetMapping("/remover/{id}")
+    public String removerUsuario(@PathVariable Long id) {
+        Usuario usuario = usuarioService.buscarPorId(id);
+        if (usuario != null) {
+            Papel papel = usuario.getPapel();
+            usuarioService.remover(id);
+            return papel == Papel.ADMINISTRADOR
+                    ? "redirect:/admin/usuarios/admins"
+                    : "redirect:/admin/usuarios/testadores";
         }
         return "redirect:/admin/usuarios";
     }

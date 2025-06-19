@@ -12,5 +12,5 @@ import java.util.List;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     UserDetails findByEmail(String email);
-    List<User> findByPapel(Papel papel);
+    List<Usuario> findByPapel(Papel papel);
 }
