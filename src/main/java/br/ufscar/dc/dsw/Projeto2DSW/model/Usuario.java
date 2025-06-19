@@ -40,7 +40,7 @@ public class Usuario implements UserDetails {
     private List<Projeto> projetos;
 
     public Long getId_usuario() {
-        return idUsuario;
+        return null;
     }
 
     public void setId_usuario(Long id_usuario) {
@@ -105,7 +105,8 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if(this.papel == Papel.ADMINISTRADOR) return List.of(new SimpleGrantedAuthority("ROLE_ADMINISTRADOR"), new SimpleGrantedAuthority("ROLE_TESTADOR"));
+        if (this.papel == Papel.ADMINISTRADOR)
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMINISTRADOR"), new SimpleGrantedAuthority("ROLE_TESTADOR"));
         else return List.of(new SimpleGrantedAuthority("ROLE_TESTADOR"));
     }
 
