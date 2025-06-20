@@ -3,6 +3,7 @@ package br.ufscar.dc.dsw.Projeto2DSW.infra.seed;
 import br.ufscar.dc.dsw.Projeto2DSW.model.Papel;
 import br.ufscar.dc.dsw.Projeto2DSW.model.Usuario;
 import br.ufscar.dc.dsw.Projeto2DSW.repository.UsuarioRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,9 +21,10 @@ public class UsuariosIniciais implements CommandLineRunner {
     private PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional
     public void run(String... args) {
 
-        if (usuarioRepository.findByEmail("admin@teste.com") == null) {
+        if (usuarioRepository.findByEmail("admin@teste.com").isEmpty()) {
             Usuario admin = new Usuario();
             admin.setNome("Administrador");
             admin.setEmail("admin@teste.com");
@@ -31,12 +33,12 @@ public class UsuariosIniciais implements CommandLineRunner {
             admin.setData_criacao(new Timestamp(System.currentTimeMillis()));
 
             usuarioRepository.save(admin);
-            System.out.println("Usuário testador criado com sucesso: " + admin.getEmail());
+            System.out.println("Usuário administrador criado com sucesso: " + admin.getEmail());
         } else {
-            System.out.println("Usuário testador já existe.");
+            System.out.println("Usuário administrador já existe.");
         }
 
-        if (usuarioRepository.findByEmail("testador@teste.com") == null) {
+        if (usuarioRepository.findByEmail("testador@teste.com").isEmpty()) {
             Usuario testador = new Usuario();
             testador.setNome("Testador");
             testador.setEmail("testador@teste.com");
@@ -45,9 +47,9 @@ public class UsuariosIniciais implements CommandLineRunner {
             testador.setData_criacao(new Timestamp(System.currentTimeMillis()));
 
             usuarioRepository.save(testador);
-            System.out.println("Usuário administrador criado com sucesso: " + testador.getEmail());
+            System.out.println("Usuário testador criado com sucesso: " + testador.getEmail());
         } else {
-            System.out.println("Usuário administrador já existe.");
+            System.out.println("Usuário testador já existe.");
         }
     }
 }

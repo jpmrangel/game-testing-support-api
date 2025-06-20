@@ -1,3 +1,4 @@
+
 package br.ufscar.dc.dsw.Projeto2DSW.controller;
 
 import br.ufscar.dc.dsw.Projeto2DSW.model.Usuario;
@@ -15,44 +16,91 @@ public class AdminController {
     @Autowired
     private UserService service;
 
-    @GetMapping
-    public String listarAdmins(Model model) {
-        model.addAttribute("admins", service.listarPorPapel(Papel.ADMINISTRADOR));
-        return "admin/listarAdmin";
+    @GetMapping("/home")
+    public String adminHomePage() {
+        return "admin/home";
     }
 
-    @GetMapping("/novo")
-    public String novoAdmin(Model model) {
-        model.addAttribute("admin", new Usuario());
+    @GetMapping("/testadores")
+    public String listarTestadores(Model model) {
+        model.addAttribute("usuarios", service.listarPorPapel(Papel.TESTADOR));
+        return "testador/list";
+    }
+
+    @GetMapping("/testador/novo")
+    public String novoTestador(Model model) {
+        model.addAttribute("usuario", new Usuario());
+        return "testador/form";
+    }
+
+    @PostMapping("/testador")
+    public String salvarTestador(@ModelAttribute Usuario usuario) {
+        usuario.setPapel(Papel.TESTADOR);
+        service.salvar(usuario);
+        return "redirect:/admin/testadores";
+    }
+
+    @GetMapping("/testador/editar/{id}")
+    public String editarTestador(@PathVariable Long id, Model model) {
+        Usuario testador = service.buscarPorId(id)
+                .orElseThrow(() -> new IllegalArgumentException("ID inválido: " + id));
+        model.addAttribute("usuario", testador);
+        return "testador/form";
+    }
+
+    @PostMapping("/testador/editar/{id}")
+    public String atualizarTestador(@PathVariable Long id, @ModelAttribute Usuario testadorAtualizado) {
+        testadorAtualizado.setId_usuario(id);
+        testadorAtualizado.setPapel(Papel.TESTADOR);
+        service.salvar(testadorAtualizado);
+        return "redirect:/admin/testadores";
+    }
+
+    @GetMapping("/testador/excluir/{id}")
+    public String excluirTestador(@PathVariable Long id) {
+        service.excluir(id);
+        return "redirect:/admin/testadores";
+    }
+
+
+    @GetMapping("/administradores")
+    public String listarAdministradores(Model model) {
+        model.addAttribute("usuarios", service.listarPorPapel(Papel.ADMINISTRADOR));
+        return "admin/list";
+    }
+
+    @GetMapping("/administrador/novo")
+    public String novoAdministrador(Model model) {
+        model.addAttribute("usuario", new Usuario());
         return "admin/form";
     }
 
-    @PostMapping
-    public String salvarAdmin(@ModelAttribute Usuario admin) {
-        admin.setPapel(Papel.ADMINISTRADOR);
-        service.salvar(admin);
-        return "redirect:/admin";
+    @PostMapping("/administrador")
+    public String salvarAdministrador(@ModelAttribute Usuario usuario) {
+        usuario.setPapel(Papel.ADMINISTRADOR);
+        service.salvar(usuario);
+        return "redirect:/admin/administradores";
     }
 
-    @GetMapping("/editar/{id}")
+    @GetMapping("/administrador/editar/{id}")
     public String editarAdmin(@PathVariable Long id, Model model) {
         Usuario admin = service.buscarPorId(id)
                 .orElseThrow(() -> new IllegalArgumentException("ID inválido: " + id));
-        model.addAttribute("admin", admin);
+        model.addAttribute("usuario", admin);
         return "admin/form";
     }
 
-    @PostMapping("/editar/{id}")
+    @PostMapping("/administrador/editar/{id}")
     public String atualizarAdmin(@PathVariable Long id, @ModelAttribute Usuario adminAtualizado) {
         adminAtualizado.setId_usuario(id);
         adminAtualizado.setPapel(Papel.ADMINISTRADOR);
         service.salvar(adminAtualizado);
-        return "redirect:/admin";
+        return "redirect:/admin/administradores";
     }
 
-    @GetMapping("/excluir/{id}")
-    public String excluirAdmin(@PathVariable Long id) {
+    @GetMapping("/administrador/excluir/{id}")
+    public String excluirAdministrador(@PathVariable Long id) {
         service.excluir(id);
-        return "redirect:/admin";
+        return "redirect:/admin/administradores";
     }
 }

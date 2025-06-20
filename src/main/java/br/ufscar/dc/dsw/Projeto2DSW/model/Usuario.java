@@ -40,7 +40,7 @@ public class Usuario implements UserDetails {
     private List<Projeto> projetos;
 
     public Long getId_usuario() {
-        return null;
+        return this.idUsuario;
     }
 
     public void setId_usuario(Long id_usuario) {
