@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Minhas Sessões de Teste</title>
+</head>
+<body>
+
+<h1>Minhas Sessões de Teste</h1>
+
+<table border="1">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Projeto</th>
+    <th>Estratégia</th>
+    <th>Descrição</th>
+    <th>Tempo (min)</th>
+    <th>Status</th>
+    <th>Data de Criação</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="sessao : ${sessoes}">
+    <td th:text="${sessao.id_sessao}">ID</td>
+    <td th:text="${sessao.projeto.nome}">Projeto</td>
+    <td th:text="${sessao.estrategia.nome}">Estratégia</td>
+    <td th:text="${sessao.descricao}">Descrição</td>
+    <td th:text="${sessao.tempo}">Tempo</td>
+    <td th:text="${sessao.status}">Status</td>
+    <td th:text="${#dates.format(sessao.data_criacao, 'dd/MM/yyyy HH:mm')}">Data</td>
+  </tr>
+  </tbody>
+</table>
+
+<br/>
+<a th:href="@{/testador/projetos/listar-projetos}">
+  <button>Voltar</button>
+</a>
+
+</body>
+</html>

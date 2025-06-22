@@ -25,6 +25,7 @@
             </a>
         </th>
         <th>Membros</th>
+        <th>Ações</th>
     </tr>
     </thead>
     <tbody>
@@ -37,11 +38,18 @@
                 <li th:each="usuario : ${projeto.usuarios}" th:text="${usuario.nome}"></li>
             </ul>
         </td>
+        <td>
+            <a th:href="@{'/testador/sessoes/nova?projetoId=' + ${projeto.id_projeto}}">
+                <button>Criar Sessão de Teste</button>
+            </a>
+        </td>
     </tr>
     </tbody>
 </table>
 
-<a th:href="@{/testador/projetos}"><button>Voltar</button></a>
+<a th:href="@{/testador/projetos}">
+    <button>Voltar</button>
+</a>
 
 </body>
 </html>
