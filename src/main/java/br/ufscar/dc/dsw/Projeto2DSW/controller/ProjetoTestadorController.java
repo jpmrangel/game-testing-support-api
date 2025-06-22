@@ -20,11 +20,6 @@ public class ProjetoTestadorController {
     @Autowired
     ProjetoRepository projetoRepository;
 
-    @GetMapping("")
-    public String projetos() {
-        return "testador/projetos/projetos";
-    }
-
     @GetMapping("/listar-projetos")
     public String listarProjetos(@AuthenticationPrincipal Usuario usuarioLogado,
                                  @RequestParam(defaultValue = "nome") String sortField,

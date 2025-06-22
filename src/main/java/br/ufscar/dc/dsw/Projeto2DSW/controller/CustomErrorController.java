@@ -9,6 +9,6 @@ public class CustomErrorController implements ErrorController {
 
     @RequestMapping("/error")
     public String handleError() {
-        return "erro"; // Certifique-se que 'erro.html' existe em templates/
+        return "erro";
     }
 }
