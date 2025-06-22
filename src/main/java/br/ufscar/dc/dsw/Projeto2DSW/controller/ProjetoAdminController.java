@@ -5,6 +5,7 @@ import br.ufscar.dc.dsw.Projeto2DSW.model.Usuario;
 import br.ufscar.dc.dsw.Projeto2DSW.repository.ProjetoRepository;
 import br.ufscar.dc.dsw.Projeto2DSW.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +28,24 @@ public class ProjetoAdminController {
     }
 
     @GetMapping("/listar-projetos")
-    public String listarProjetos(Model model) {
-        model.addAttribute("projetos", projetoRepository.findAll());
+    public String listarProjetos(@RequestParam(defaultValue = "nome") String sortField,
+                                 @RequestParam(defaultValue = "asc") String sortDir,
+                                 Model model) {
+
+        List<String> camposPermitidos = List.of("nome", "dataCriacao");
+        if (!camposPermitidos.contains(sortField)) {
+            sortField = "nome";
+        }
+
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortField).ascending()
+                : Sort.by(sortField).descending();
+
+        model.addAttribute("projetos", projetoRepository.findAll(sort));
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
+
         return "admin/projetos/listar-projetos";
     }
 
