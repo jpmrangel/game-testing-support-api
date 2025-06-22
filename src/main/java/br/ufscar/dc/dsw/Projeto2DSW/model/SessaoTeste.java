@@ -10,6 +10,7 @@ import java.util.List;
 public class SessaoTeste {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_sessao")
     private Long idSessao;
 
     @Column(nullable = false)

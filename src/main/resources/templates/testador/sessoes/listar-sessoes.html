@@ -24,25 +24,25 @@
             </thead>
             <tbody>
                 <tr th:each="sessao : ${sessoes}">
-                    <td th:text="${sessao.id_sessao}">ID</td>
+                    <td th:text="${sessao.idSessao}">ID</td>
                     <td th:text="${sessao.projeto.nome}">Projeto</td>
                     <td th:text="${sessao.estrategia.nome}">Estratégia</td>
                     <td th:text="${sessao.descricao}">Descrição</td>
                     <td th:text="${sessao.tempo}">Tempo</td>
                     <td>
-                        <span th:switch="${sessao.status}">
-                            <span th:case="'CRIADO'" class="badge bg-secondary">Criado</span>
-                            <span th:case="'EM_EXECUCAO'" class="badge bg-warning text-dark">Em Execução</span>
-                            <span th:case="'FINALIZADO'" class="badge bg-success">Finalizado</span>
-                        </span>
+                      <span th:switch="${sessao.status.name()}">
+                          <span th:case="'CRIADO'" class="badge bg-secondary">Criado</span>
+                          <span th:case="'EM_EXECUCAO'" class="badge bg-warning text-dark">Em Execução</span>
+                          <span th:case="'FINALIZADO'" class="badge bg-success">Finalizado</span>
+                      </span>
                     </td>
                     <td th:text="${#dates.format(sessao.data_criacao, 'dd/MM/yyyy HH:mm')}">Data</td>
                     <td>
-                        <a th:href="@{/testador/sessoes/detalhes/__${sessao.id_sessao}__}" 
-                           class="btn btn-sm btn-info">Detalhes</a>
-                        <a th:if="${sessao.status == 'CRIADO'}" 
-                           th:href="@{/testador/sessoes/iniciar/__${sessao.id_sessao}__}" 
-                           class="btn btn-sm btn-success">Iniciar</a>
+                      <a th:href="@{/testador/sessoes/detalhes/__${sessao.idSessao}__}" 
+                          class="btn btn-sm btn-info">Detalhes</a>
+                      <a th:if="${sessao.status == 'CRIADO'}" 
+                          th:href="@{/testador/sessoes/iniciar/__${sessao.idSessao}__}" 
+                          class="btn btn-sm btn-success">Iniciar</a>
                     </td>
                 </tr>
             </tbody>

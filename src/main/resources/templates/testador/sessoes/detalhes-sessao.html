@@ -24,7 +24,7 @@
 </head>
 <body>
     <div class="container mt-4">
-        <h1>Sessão de Teste: <span th:text="${sessao.id_sessao}"></span></h1>
+        <h1>Sessão de Teste: <span th:text="${sessao.idSessao}"></span></h1>
         
         <div class="card mb-4">
             <div class="card-header">
@@ -65,7 +65,7 @@
         
         <div th:if="${sessao.status == 'EM_EXECUCAO'}">
             <h4>Reportar Bug</h4>
-            <form th:action="@{/testador/sessoes/reportar-bug/__${sessao.id_sessao}__}" method="post">
+            <form th:action="@{/testador/sessoes/reportar-bug/__${sessao.idSessao}__}" method="post">
                 <div class="mb-3">
                     <label for="descricao" class="form-label">Descrição</label>
                     <textarea class="form-control" id="descricao" name="descricao" rows="3" required></textarea>
@@ -110,7 +110,7 @@
         </div>
         
         <div class="mt-4">
-            <a th:href="@{/testador/sessoes/listar}" class="btn btn-secondary">Voltar para Minhas Sessões</a>
+            <a th:href="@{/testador/sessoes/listar-sessoes}" class="btn btn-secondary">Voltar para Minhas Sessões</a>
         </div>
     </div>
 
