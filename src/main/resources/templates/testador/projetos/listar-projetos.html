@@ -11,9 +11,19 @@
 <table border="1">
     <thead>
     <tr>
-        <th>Nome</th>
+        <th>
+            <a th:href="@{/testador/projetos/listar-projetos(sortField='nome', sortDir=${reverseSortDir})}">
+                Nome
+                <span th:text="${sortField == 'nome' ? (sortDir == 'asc' ? '↑' : '↓') : ''}"></span>
+            </a>
+        </th>
         <th>Descrição</th>
-        <th>Data de Criação</th>
+        <th>
+            <a th:href="@{/testador/projetos/listar-projetos(sortField='dataCriacao', sortDir=${reverseSortDir})}">
+                Data de Criação
+                <span th:text="${sortField == 'dataCriacao' ? (sortDir == 'asc' ? '↑' : '↓') : ''}"></span>
+            </a>
+        </th>
         <th>Membros</th>
         <th>Ações</th>
     </tr>
@@ -22,17 +32,24 @@
     <tr th:each="projeto : ${projetos}">
         <td th:text="${projeto.nome}">Nome</td>
         <td th:text="${projeto.descricao}">Descrição</td>
-        <td th:text="${#dates.format(projeto.data_criacao, 'dd/MM/yyyy HH:mm')}">Data</td>
+        <td th:text="${#dates.format(projeto.dataCriacao, 'dd/MM/yyyy HH:mm')}">Data</td>
         <td>
             <ul>
                 <li th:each="usuario : ${projeto.usuarios}" th:text="${usuario.nome}"></li>
             </ul>
         </td>
+        <td>
+            <a th:href="@{'/testador/sessoes/nova?projetoId=' + ${projeto.id_projeto}}">
+                <button>Criar Sessão de Teste</button>
+            </a>
+        </td>
     </tr>
     </tbody>
 </table>
 
-<a th:href="@{/testador/projetos}"><button>Voltar</button></a>
+<a th:href="@{/testador/projetos}">
+    <button>Voltar</button>
+</a>
 
 </body>
 </html>

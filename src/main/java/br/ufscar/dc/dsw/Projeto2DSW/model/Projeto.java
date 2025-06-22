@@ -19,7 +19,9 @@ public class Projeto {
     private String descricao;
 
     @CreationTimestamp
-    private Timestamp data_criacao;
+    @Column(name = "data_criacao")
+    private Timestamp dataCriacao;
+
 
     @OneToMany(mappedBy = "projeto")
     private List<SessaoTeste> sessoes;
@@ -57,12 +59,12 @@ public class Projeto {
         this.descricao = descricao;
     }
 
-    public Timestamp getData_criacao() {
-        return data_criacao;
+    public Timestamp getDataCriacao() {
+        return dataCriacao;
     }
 
-    public void setData_criacao(Timestamp data_criacao) {
-        this.data_criacao = data_criacao;
+    public void setDataCriacao(Timestamp dataCriacao) {
+        this.dataCriacao = dataCriacao;
     }
 
     public List<SessaoTeste> getSessoes() {

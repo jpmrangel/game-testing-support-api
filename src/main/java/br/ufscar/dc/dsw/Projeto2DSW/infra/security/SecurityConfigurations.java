@@ -38,7 +38,10 @@ public class SecurityConfigurations {
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/logout-message")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
                 .exceptionHandling(exceptionHandLing -> exceptionHandLing

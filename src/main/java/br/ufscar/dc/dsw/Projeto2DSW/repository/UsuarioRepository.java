@@ -1,9 +1,14 @@
 package br.ufscar.dc.dsw.Projeto2DSW.repository;
 
 import br.ufscar.dc.dsw.Projeto2DSW.model.Usuario;
+import br.ufscar.dc.dsw.Projeto2DSW.model.Papel;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
-    UserDetails findByEmail(String email);
+    Optional<Usuario> findByEmail(String email);
+    List<Usuario> findByPapel(Papel papel);
+
 }
