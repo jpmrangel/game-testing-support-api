@@ -1,39 +1,64 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
-    <title>Listar Estratégias</title>
+    <meta charset="UTF-8">
+    <title>Estratégias Cadastradas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .estrategia-img {
+            max-height: 100px;
+            object-fit: contain;
+            margin: 5px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+        .table-responsive {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
 <body>
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h1 class="display-5">Estratégias Cadastradas</h1>
+            <a th:href="@{/login}" class="btn btn-outline-primary">
+                <i class="bi bi-box-arrow-in-right"></i> Fazer Login
+            </a>
+        </div>
 
-<h1>Estratégias Cadastradas</h1>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>Exemplo</th>
+                        <th>Dica</th>
+                        <th>Imagens</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="estrategia : ${estrategias}">
+                        <td th:text="${estrategia.nome}">Nome</td>
+                        <td th:text="${estrategia.descricao}">Descrição</td>
+                        <td th:text="${estrategia.exemplo}">Exemplo</td>
+                        <td th:text="${estrategia.dica}">Dica</td>
+                        <td>
+                            <div class="d-flex flex-wrap">
+                                <div th:each="img : ${estrategia.imagens}">
+                                    <img th:src="${img.url}" alt="Imagem" class="estrategia-img" />
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-<table border="1">
-    <thead>
-    <tr>
-        <th>Nome</th>
-        <th>Descrição</th>
-        <th>Exemplo</th>
-        <th>Dica</th>
-        <th>Imagens</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="estrategia : ${estrategias}">
-        <td th:text="${estrategia.nome}">Nome</td>
-        <td th:text="${estrategia.descricao}">Descrição</td>
-        <td th:text="${estrategia.exemplo}">Exemplo</td>
-        <td th:text="${estrategia.dica}">Dica</td>
-        <td>
-            <div th:each="img : ${estrategia.imagens}">
-                <img th:src="${img.url}" alt="Imagem" style="max-height: 50px; margin: 2px;" />
-            </div>
-        </td>
-    </tr>
-    </tbody>
-</table>
-
-<a th:href="@{/login}"><button>Fazer Login</button></a>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,9 +1,6 @@
 package br.ufscar.dc.dsw.Projeto2DSW.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.sql.Timestamp;
 
 @Entity
 public class Bug {
@@ -13,9 +10,6 @@ public class Bug {
 
     @Column(nullable = false)
     private String descricao;
-
-    @CreationTimestamp
-    private Timestamp data_criacao;
 
     @ManyToOne
     @JoinColumn(name = "sessao_id")
@@ -35,14 +29,6 @@ public class Bug {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
-    }
-
-    public Timestamp getData_criacao() {
-        return data_criacao;
-    }
-
-    public void setData_criacao(Timestamp data_criacao) {
-        this.data_criacao = data_criacao;
     }
 
     public SessaoTeste getSessao() {

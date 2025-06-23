@@ -9,5 +9,9 @@ public class LoginController {
     public String login() {
         return "login";
     }
-
+    
+    @GetMapping("/")
+    public String redirectLogin() {
+        return "redirect:/login";
+    }
 }

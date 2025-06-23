@@ -1,61 +1,120 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <title>Editar Estratégia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .img-url-input {
+            margin-bottom: 10px;
+        }
+        .current-img {
+            max-height: 100px;
+            object-fit: contain;
+            margin: 5px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
-
-<h1>Editar Estratégia</h1>
-
-<form th:action="@{'/admin/estrategias/editar/' + ${estrategia.id_estrategia}}" th:object="${estrategia}" method="post">
-
-    <label for="nome">Nome:</label><br>
-    <input type="text" id="nome" th:field="*{nome}" required /><br><br>
-
-    <label for="descricao">Descrição:</label><br>
-    <textarea id="descricao" th:field="*{descricao}" rows="4" cols="50" required></textarea><br><br>
-
-    <label for="exemplo">Exemplo:</label><br>
-    <textarea id="exemplo" th:field="*{exemplo}" rows="4" cols="50" required></textarea><br><br>
-
-    <label for="dica">Dica:</label><br>
-    <textarea id="dica" th:field="*{dica}" rows="3" cols="50" required></textarea><br><br>
-
-    <label>Imagens atuais:</label><br>
-    <div>
-        <div th:each="img : ${estrategia.imagens}">
-            <img th:src="${img.url}" alt="Imagem" style="max-height: 100px; margin: 5px;" />
-            <label>
-                <input type="checkbox" name="imagensParaExcluir" th:value="${img.id_imagem}" />
-                Excluir
-            </label>
-        </div>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="display-5">Editar Estratégia</h1>
+        <a th:href="@{/admin/estrategias/listar-estrategias}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
     </div>
-    <br>
 
-    <label>Adicionar novas URLs de imagens:</label><br>
-    <div id="imagens-container">
-        <input type="text" name="imagensUrls" placeholder="URL da imagem" /><br>
+    <div class="form-container">
+        <form th:action="@{'/admin/estrategias/editar/' + ${estrategia.id_estrategia}}" th:object="${estrategia}" method="post">
+            <div class="mb-4">
+                <label for="nome" class="form-label">Nome:</label>
+                <input type="text" class="form-control" id="nome" th:field="*{nome}" required>
+            </div>
+
+            <div class="mb-4">
+                <label for="descricao" class="form-label">Descrição:</label>
+                <textarea class="form-control" id="descricao" th:field="*{descricao}" rows="5" required></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label for="exemplo" class="form-label">Exemplo:</label>
+                <textarea class="form-control" id="exemplo" th:field="*{exemplo}" rows="5" required></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label for="dica" class="form-label">Dica:</label>
+                <textarea class="form-control" id="dica" th:field="*{dica}" rows="3" required></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Imagens atuais:</label>
+                <div class="d-flex flex-wrap mb-3">
+                    <div th:each="img : ${estrategia.imagens}" class="me-3 mb-2">
+                        <img th:src="${img.url}" alt="Imagem" class="current-img" />
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="imagensParaExcluir" th:value="${img.id_imagem}" id="img-${img.id_imagem}">
+                            <label class="form-check-label" th:for="'img-' + ${img.id_imagem}">Excluir</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Adicionar novas URLs de imagens:</label>
+                <div id="imagens-container">
+                    <div class="input-group img-url-input">
+                        <input type="text" class="form-control" name="imagensUrls" placeholder="URL da imagem">
+                        <button class="btn btn-outline-danger" type="button" onclick="removerCampo(this)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-primary mt-2" onclick="adicionarCampo()">
+                    <i class="bi bi-plus-circle"></i> Adicionar mais uma imagem
+                </button>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Salvar Alterações
+                </button>
+                <a th:href="@{/admin/estrategias/listar-estrategias}" class="btn btn-outline-secondary">
+                    Cancelar
+                </a>
+            </div>
+        </form>
     </div>
-    <button type="button" onclick="adicionarCampo()">Adicionar mais uma imagem</button><br><br>
+</div>
 
-    <button type="submit">Salvar</button>
-    <a th:href="@{/admin/estrategias/listar-estrategias}"><button type="button">Cancelar</button></a>
-
-</form>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function adicionarCampo() {
         const container = document.getElementById('imagens-container');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'imagensUrls';
-        input.placeholder = 'URL da imagem';
-        container.appendChild(input);
-        container.appendChild(document.createElement('br'));
+        const div = document.createElement('div');
+        div.className = 'input-group img-url-input';
+        div.innerHTML = `
+            <input type="text" class="form-control" name="imagensUrls" placeholder="URL da imagem">
+            <button class="btn btn-outline-danger" type="button" onclick="removerCampo(this)">
+                <i class="bi bi-trash"></i>
+            </button>
+        `;
+        container.appendChild(div);
+    }
+
+    function removerCampo(button) {
+        button.closest('.img-url-input').remove();
     }
 </script>
-
 </body>
 </html>

@@ -10,7 +10,8 @@ import java.util.List;
 public class SessaoTeste {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_sessao;
+    @Column(name = "id_sessao")
+    private Long idSessao;
 
     @Column(nullable = false)
     private String descricao;
@@ -27,6 +28,10 @@ public class SessaoTeste {
     @CreationTimestamp
     private Timestamp data_criacao;
 
+    private Timestamp data_inicio;
+
+    private Timestamp data_fim;
+
     @ManyToOne
     @JoinColumn(name = "estrategia_id")
     private Estrategia estrategia;
@@ -42,12 +47,12 @@ public class SessaoTeste {
     @OneToMany(mappedBy = "sessao")
     private List<Bug> bugs;
 
-    public Long getId_sessao() {
-        return id_sessao;
+    public Long getIdSessao() {
+        return idSessao;
     }
 
-    public void setId_sessao(Long id_sessao) {
-        this.id_sessao = id_sessao;
+    public void setIdSessao(Long idSessao) {
+        this.idSessao = idSessao;
     }
 
     public String getDescricao() {
@@ -88,6 +93,22 @@ public class SessaoTeste {
 
     public void setData_criacao(Timestamp data_criacao) {
         this.data_criacao = data_criacao;
+    }
+
+    public Timestamp getData_inicio() {
+        return data_inicio;
+    }
+
+    public void setData_inicio(Timestamp data_inicio) {
+        this.data_inicio = data_inicio;
+    }
+
+    public Timestamp getData_fim() {
+        return data_fim;
+    }
+
+    public void setData_fim(Timestamp data_fim) {
+        this.data_fim = data_fim;
     }
 
     public Estrategia getEstrategia() {
