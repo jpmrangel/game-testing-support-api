@@ -136,18 +136,19 @@
             if ([[${sessao.status.name()}]] === 'EM_EXECUCAO') {
                 // Obtém o tempo total em minutos e converte para milissegundos
                 const tempoTotalMs = [[${sessao.tempo}]] * 60 * 1000;
-                
-                // Obtém a data de início da sessão
-                const dataInicio = new Date([[${#dates.format(sessao.data_inicio, 'yyyy,MM-1,dd,HH,mm,ss')}]]);
-                
+
+                // Obtém o timestamp da data de início
+                const dataInicioTimestamp = [[${dataInicioTimestamp}]];
+                const dataInicio = new Date(dataInicioTimestamp);
+
                 // Calcula a data de término esperada
                 const dataTermino = new Date(dataInicio.getTime() + tempoTotalMs);
-                
+
                 // Função para atualizar o tempo restante
                 function atualizarTempoRestante() {
                     const agora = new Date();
                     const tempoRestanteMs = dataTermino - agora;
-                    
+
                     // Verifica se o tempo já acabou
                     if (tempoRestanteMs <= 0) {
                         document.getElementById('tempoRestante').textContent = '00:00:00';
@@ -155,21 +156,21 @@
                         setTimeout(() => location.reload(), 1000);
                         return;
                     }
-                    
+
                     // Converte milissegundos para horas, minutos e segundos
                     const horas = Math.floor(tempoRestanteMs / (1000 * 60 * 60));
                     const minutos = Math.floor((tempoRestanteMs % (1000 * 60 * 60)) / (1000 * 60));
                     const segundos = Math.floor((tempoRestanteMs % (1000 * 60)) / 1000);
-                    
+
                     // Formata para exibição (HH:MM:SS)
-                    const tempoFormatado = 
-                        String(horas).padStart(2, '0') + ':' + 
-                        String(minutos).padStart(2, '0') + ':' + 
+                    const tempoFormatado =
+                        String(horas).padStart(2, '0') + ':' +
+                        String(minutos).padStart(2, '0') + ':' +
                         String(segundos).padStart(2, '0');
-                    
+
                     document.getElementById('tempoRestante').textContent = tempoFormatado;
                 }
-                
+
                 // Atualiza imediatamente e depois a cada segundo
                 atualizarTempoRestante();
                 setInterval(atualizarTempoRestante, 1000);

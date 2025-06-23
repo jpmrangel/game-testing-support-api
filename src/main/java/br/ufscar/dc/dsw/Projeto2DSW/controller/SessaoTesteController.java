@@ -111,11 +111,16 @@ public class SessaoTesteController {
     public String detalhesSessao(@PathVariable Long id, Model model) {
         SessaoTeste sessao = sessaoTesteRepository.findById(id).orElseThrow();
         List<Bug> bugs = bugRepository.findBySessao_IdSessao(id);
-        
+
         model.addAttribute("sessao", sessao);
         model.addAttribute("bugs", bugs);
         model.addAttribute("novoBug", new Bug());
-        
+
+        // Adicionar timestamp de início se disponível
+        if(sessao.getData_inicio() != null) {
+            model.addAttribute("dataInicioTimestamp", sessao.getData_inicio().getTime());
+        }
+
         return "testador/sessoes/detalhes-sessao";
     }
 
