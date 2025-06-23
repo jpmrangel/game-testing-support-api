@@ -28,10 +28,8 @@ public class SessaoTeste {
     @CreationTimestamp
     private Timestamp data_criacao;
 
-    @CreationTimestamp
     private Timestamp data_inicio;
 
-    @CreationTimestamp
     private Timestamp data_fim;
 
     @ManyToOne

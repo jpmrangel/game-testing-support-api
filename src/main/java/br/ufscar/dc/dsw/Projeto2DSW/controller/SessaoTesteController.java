@@ -104,7 +104,7 @@ public class SessaoTesteController {
             sessaoTesteRepository.save(sessao);
         }
         
-        return "redirect:/testador/sessoes/listar";
+        return "redirect:/testador/sessoes/listar-sessoes";
     }
 
     @GetMapping("/detalhes/{id}")
@@ -127,8 +127,6 @@ public class SessaoTesteController {
         
         if (sessao.getStatus() == Status.EM_EXECUCAO) {
             bug.setSessao(sessao);
-            // bug.setReportadoPor(usuarioLogado);
-            bug.setData_criacao(new Timestamp(System.currentTimeMillis()));
             bugRepository.save(bug);
         }
         

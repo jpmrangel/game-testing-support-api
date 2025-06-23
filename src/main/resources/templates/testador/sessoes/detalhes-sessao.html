@@ -10,6 +10,7 @@
             font-weight: bold;
             text-align: center;
             margin: 20px 0;
+            color: #dc3545;
         }
         .estrategia-info {
             background-color: #f8f9fa;
@@ -19,6 +20,10 @@
         }
         .bug-list {
             margin-top: 30px;
+        }
+        .img-thumbnail {
+            max-height: 200px;
+            object-fit: contain;
         }
     </style>
 </head>
@@ -38,20 +43,25 @@
                         <p><strong>Tempo definido:</strong> <span th:text="${sessao.tempo}"></span> minutos</p>
                     </div>
                     <div class="col-md-6">
+                        <p><strong>Criação:</strong> 
+                            <span th:text="${#dates.format(sessao.data_criacao, 'dd/MM/yyyy HH:mm')}"></span>
+                        </p>
+
                         <p><strong>Início:</strong> 
                             <span th:if="${sessao.data_inicio != null}" 
-                                  th:text="${#dates.format(sessao.data_inicio, 'dd/MM/yyyy HH:mm')}"></span>
+                                th:text="${#dates.format(sessao.data_inicio, 'dd/MM/yyyy HH:mm')}"></span>
                             <span th:unless="${sessao.data_inicio != null}">-</span>
                         </p>
+
                         <p><strong>Término:</strong> 
                             <span th:if="${sessao.data_fim != null}" 
-                                  th:text="${#dates.format(sessao.data_fim, 'dd/MM/yyyy HH:mm')}"></span>
+                                th:text="${#dates.format(sessao.data_fim, 'dd/MM/yyyy HH:mm')}"></span>
                             <span th:unless="${sessao.data_fim != null}">-</span>
                         </p>
                     </div>
                 </div>
                 
-                <div th:if="${sessao.status == 'EM_EXECUCAO'}" class="timer-display">
+                <div th:if="${sessao.status.name() == 'EM_EXECUCAO'}" class="timer-display">
                     Tempo restante: <span id="tempoRestante"></span>
                 </div>
             </div>
@@ -59,25 +69,27 @@
         
         <div class="estrategia-info">
             <h4>Estratégia de Teste</h4>
-            <h5 th:text="${sessao.estrategia.nome}"></h5>
-            <p th:text="${sessao.estrategia.descricao}"></p>
+            <p><strong>Nome:</strong> <span th:text="${sessao.estrategia.nome}"></span></p>
+            <p><strong>Descrição:</strong> <span th:text="${sessao.estrategia.descricao}"></span></p>
+            <p><strong>Dica:</strong> <span th:text="${sessao.estrategia.dica}"></span></p>
+            <p><strong>Exemplo:</strong> <span th:text="${sessao.estrategia.exemplo}"></span></p>
+
+            <div th:if="${sessao.estrategia.imagens != null and !#lists.isEmpty(sessao.estrategia.imagens)}">
+                <h5>Imagens da Estratégia:</h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3" th:each="imagem : ${sessao.estrategia.imagens}">
+                        <img th:src="@{${imagem.url}}" class="img-fluid img-thumbnail" alt="Imagem da Estratégia">
+                    </div>
+                </div>
+            </div>
         </div>
         
-        <div th:if="${sessao.status == 'EM_EXECUCAO'}">
+        <div th:if="${sessao.status.name() == 'EM_EXECUCAO'}">
             <h4>Reportar Bug</h4>
             <form th:action="@{/testador/sessoes/reportar-bug/__${sessao.idSessao}__}" method="post">
                 <div class="mb-3">
                     <label for="descricao" class="form-label">Descrição</label>
                     <textarea class="form-control" id="descricao" name="descricao" rows="3" required></textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="severidade" class="form-label">Severidade</label>
-                    <select class="form-select" id="severidade" name="severidade" required>
-                        <option value="BAIXA">Baixa</option>
-                        <option value="MEDIA">Média</option>
-                        <option value="ALTA">Alta</option>
-                        <option value="CRITICA">Crítica</option>
-                    </select>
                 </div>
                 <button type="submit" class="btn btn-primary">Reportar Bug</button>
             </form>
@@ -89,23 +101,25 @@
                 <thead>
                     <tr>
                         <th>Descrição</th>
-                        <th>Severidade</th>
-                        <th>Data</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="bug : ${bugs}">
                         <td th:text="${bug.descricao}"></td>
-                        <td th:text="${bug.severidade}"></td>
-                        <td th:text="${#dates.format(bug.dataReporte, 'dd/MM/yyyy HH:mm')}"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
-        <div th:if="${sessao.status == 'EM_EXECUCAO'}" class="text-center mt-4">
-            <a th:href="@{/testador/sessoes/finalizar/__${sessao.id_sessao}__}" class="btn btn-danger">
+        <div th:if="${sessao.status.name() == 'EM_EXECUCAO'}" class="mt-4">
+            <a th:href="@{/testador/sessoes/finalizar/__${sessao.idSessao}__}" class="btn btn-danger">
                 Finalizar Sessão Antes do Tempo
+            </a>
+        </div>
+
+        <div th:if="${sessao.status.name() == 'CRIADO'}" class="mt-4">
+            <a th:href="@{/testador/sessoes/iniciar/__${sessao.idSessao}__}" class="btn btn-success">
+                Iniciar Sessão de Teste
             </a>
         </div>
         
@@ -114,40 +128,57 @@
         </div>
     </div>
 
-    <script th:if="${sessao.status == 'EM_EXECUCAO'}">
-        // Cálculo do tempo restante
-        const tempoTotal = /*[[${sessao.tempo}]]*/ 0 * 60; // em segundos
-        
-        // Forma correta de acessar o timestamp do Thymeleaf
-        const inicioTimestamp = /*[[${sessao.data_inicio != null ? sessao.data_inicio.time : 0}]]*/ 0;
-        const inicio = new Date(inicioTimestamp);
-        
-        const agora = new Date();
-        let decorrido = Math.floor((agora - inicio) / 1000); // em segundos
-        let restante = tempoTotal - decorrido;
-        
-        function atualizarTempo() {
-            if (restante <= 0) {
-                document.getElementById('tempoRestante').textContent = 'Sessão encerrada';
-                location.reload(); // Recarrega a página quando o tempo acabar
-                return;
+    <!-- Script para exibir o tempo restante -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verifica se a sessão está em execução
+            if ([[${sessao.status.name()}]] === 'EM_EXECUCAO') {
+                // Obtém o tempo total em minutos e converte para milissegundos
+                const tempoTotalMs = [[${sessao.tempo}]] * 60 * 1000;
+                
+                // Obtém a data de início da sessão
+                const dataInicio = new Date([[${#dates.format(sessao.data_inicio, 'yyyy,MM-1,dd,HH,mm,ss')}]]);
+                
+                // Calcula a data de término esperada
+                const dataTermino = new Date(dataInicio.getTime() + tempoTotalMs);
+                
+                // Função para atualizar o tempo restante
+                function atualizarTempoRestante() {
+                    const agora = new Date();
+                    const tempoRestanteMs = dataTermino - agora;
+                    
+                    // Verifica se o tempo já acabou
+                    if (tempoRestanteMs <= 0) {
+                        document.getElementById('tempoRestante').textContent = '00:00:00';
+                        // Recarrega a página para atualizar o status
+                        setTimeout(() => location.reload(), 1000);
+                        return;
+                    }
+                    
+                    // Converte milissegundos para horas, minutos e segundos
+                    const horas = Math.floor(tempoRestanteMs / (1000 * 60 * 60));
+                    const minutos = Math.floor((tempoRestanteMs % (1000 * 60 * 60)) / (1000 * 60));
+                    const segundos = Math.floor((tempoRestanteMs % (1000 * 60)) / 1000);
+                    
+                    // Formata para exibição (HH:MM:SS)
+                    const tempoFormatado = 
+                        String(horas).padStart(2, '0') + ':' + 
+                        String(minutos).padStart(2, '0') + ':' + 
+                        String(segundos).padStart(2, '0');
+                    
+                    document.getElementById('tempoRestante').textContent = tempoFormatado;
+                }
+                
+                // Atualiza imediatamente e depois a cada segundo
+                atualizarTempoRestante();
+                setInterval(atualizarTempoRestante, 1000);
             }
-            
-            const minutos = Math.floor(restante / 60);
-            const segundos = restante % 60;
-            document.getElementById('tempoRestante').textContent = 
-                `${minutos}:${segundos < 10 ? '0' + segundos : segundos}`;
-            
-            restante--;
-            setTimeout(atualizarTempo, 1000);
-        }
-        
-        // Verifica se a sessão realmente começou
-        if (inicioTimestamp > 0) {
-            atualizarTempo();
-        } else {
-            document.getElementById('tempoRestante').textContent = 'Tempo não disponível';
-        }
+        });
+        /*]]>*/
     </script>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
