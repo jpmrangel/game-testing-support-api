@@ -5,10 +5,12 @@ import br.ufscar.dc.dsw.Projeto2DSW.model.Usuario;
 import br.ufscar.dc.dsw.Projeto2DSW.repository.ProjetoRepository;
 import br.ufscar.dc.dsw.Projeto2DSW.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,8 +94,12 @@ public class ProjetoAdminController {
     }
 
     @PostMapping("/excluir/{id}")
-    public String excluirProjeto(@PathVariable Long id) {
-        projetoRepository.deleteById(id);
+    public String excluirProjeto(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            projetoRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("erroExclusao", true);
+        }
         return "redirect:/admin/projetos/listar-projetos";
     }
 }
