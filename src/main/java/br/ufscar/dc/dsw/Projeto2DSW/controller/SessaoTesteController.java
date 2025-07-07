@@ -9,7 +9,6 @@ import br.ufscar.dc.dsw.Projeto2DSW.repository.BugRepository;
 import br.ufscar.dc.dsw.Projeto2DSW.repository.EstrategiaRepository;
 import br.ufscar.dc.dsw.Projeto2DSW.repository.ProjetoRepository;
 import br.ufscar.dc.dsw.Projeto2DSW.repository.SessaoTesteRepository;
-import br.ufscar.dc.dsw.Projeto2DSW.repository.UsuarioRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
