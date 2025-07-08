@@ -5,10 +5,12 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+
 
 @Entity
 public class Usuario implements UserDetails {
@@ -39,10 +41,12 @@ public class Usuario implements UserDetails {
     @ManyToMany(mappedBy = "usuarios")
     private List<Projeto> projetos;
 
+    @JsonProperty("id_usuario")
     public Long getId_usuario() {
         return this.idUsuario;
     }
 
+    @JsonProperty("id_usuario")
     public void setId_usuario(Long id_usuario) {
         this.idUsuario = id_usuario;
     }

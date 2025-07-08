@@ -1,106 +1,123 @@
-
 package br.ufscar.dc.dsw.Projeto2DSW.controller;
 
-import br.ufscar.dc.dsw.Projeto2DSW.model.Usuario;
 import br.ufscar.dc.dsw.Projeto2DSW.model.Papel;
+import br.ufscar.dc.dsw.Projeto2DSW.model.Usuario;
 import br.ufscar.dc.dsw.Projeto2DSW.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-@Controller
-@RequestMapping("/admin")
+
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/admin")
 public class AdminController {
 
     @Autowired
     private UserService service;
 
-    @GetMapping("/home")
-    public String adminHomePage() {
-        return "admin/home";
-    }
 
     @GetMapping("/testadores")
-    public String listarTestadores(Model model) {
-        model.addAttribute("usuarios", service.listarPorPapel(Papel.TESTADOR));
-        return "testador/list";
+    public ResponseEntity<List<Usuario>> listarTestadores() {
+        List<Usuario> testadores = service.listarPorPapel(Papel.TESTADOR);
+        return ResponseEntity.ok(testadores);
     }
 
-    @GetMapping("/testador/novo")
-    public String novoTestador(Model model) {
-        model.addAttribute("usuario", new Usuario());
-        return "testador/form";
+    @PostMapping("/testadores")
+    public ResponseEntity<Usuario> criarTestador(@RequestBody Usuario usuario) {
+        try {
+            usuario.setPapel(Papel.TESTADOR);
+            Usuario novoUsuario = service.salvar(usuario);
+
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(novoUsuario.getId_usuario()).toUri();
+
+            return ResponseEntity.created(location).body(novoUsuario);
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 
-    @PostMapping("/testador")
-    public String salvarTestador(@ModelAttribute Usuario usuario) {
-        usuario.setPapel(Papel.TESTADOR);
-        service.salvar(usuario);
-        return "redirect:/admin/testadores";
+    @PutMapping("/testadores/{id}")
+    public ResponseEntity<Usuario> atualizarTestador(@PathVariable Long id, @RequestBody Usuario usuario) {
+        return service.buscarPorId(id)
+                .map(existingUser -> {
+                    usuario.setId_usuario(id);
+                    usuario.setPapel(Papel.TESTADOR);
+                    Usuario usuarioAtualizado = service.salvar(usuario);
+                    return ResponseEntity.ok(usuarioAtualizado);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
-
-    @GetMapping("/testador/editar/{id}")
-    public String editarTestador(@PathVariable Long id, Model model) {
-        Usuario testador = service.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException("ID inválido: " + id));
-        model.addAttribute("usuario", testador);
-        return "testador/form";
-    }
-
-    @PostMapping("/testador/editar/{id}")
-    public String atualizarTestador(@PathVariable Long id, @ModelAttribute Usuario testadorAtualizado) {
-        testadorAtualizado.setId_usuario(id);
-        testadorAtualizado.setPapel(Papel.TESTADOR);
-        service.salvar(testadorAtualizado);
-        return "redirect:/admin/testadores";
-    }
-
-    @GetMapping("/testador/excluir/{id}")
-    public String excluirTestador(@PathVariable Long id) {
-        service.excluir(id);
-        return "redirect:/admin/testadores";
-    }
-
 
     @GetMapping("/administradores")
-    public String listarAdministradores(Model model) {
-        model.addAttribute("usuarios", service.listarPorPapel(Papel.ADMINISTRADOR));
-        return "admin/list";
+    public ResponseEntity<List<Usuario>> listarAdministradores() {
+        List<Usuario> administradores = service.listarPorPapel(Papel.ADMINISTRADOR);
+        return ResponseEntity.ok(administradores);
     }
 
-    @GetMapping("/administrador/novo")
-    public String novoAdministrador(Model model) {
-        model.addAttribute("usuario", new Usuario());
-        return "admin/form";
+    @PostMapping("/administradores")
+    public ResponseEntity<Usuario> criarAdministrador(@RequestBody Usuario usuario) {
+        try {
+            usuario.setPapel(Papel.ADMINISTRADOR);
+            Usuario novoAdmin = service.salvar(usuario);
+
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(novoAdmin.getId_usuario()).toUri();
+
+            return ResponseEntity.created(location).body(novoAdmin);
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 
-    @PostMapping("/administrador")
-    public String salvarAdministrador(@ModelAttribute Usuario usuario) {
-        usuario.setPapel(Papel.ADMINISTRADOR);
-        service.salvar(usuario);
-        return "redirect:/admin/administradores";
+    @PutMapping("/administradores/{id}")
+    public ResponseEntity<?> atualizarAdmin(@PathVariable Long id, @RequestBody Usuario adminAtualizado) {
+        // Primeiro, verifica se o administrador a ser atualizado existe
+        return service.buscarPorId(id)
+                .map(existingAdmin -> {
+                    adminAtualizado.setId_usuario(id);
+                    adminAtualizado.setPapel(Papel.ADMINISTRADOR);
+
+                    try {
+                        Usuario usuarioAtualizado = service.salvar(adminAtualizado);
+                        return ResponseEntity.ok(usuarioAtualizado);
+                    } catch (DataIntegrityViolationException e) {
+
+                        return ResponseEntity
+                                .status(HttpStatus.CONFLICT)
+                                .body("Erro: O e-mail informado já está em uso por outro usuário.");
+                    }
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/administrador/editar/{id}")
-    public String editarAdmin(@PathVariable Long id, Model model) {
-        Usuario admin = service.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException("ID inválido: " + id));
-        model.addAttribute("usuario", admin);
-        return "admin/form";
+    @GetMapping("/usuarios/{id}")
+    public ResponseEntity<Usuario> getUsuarioPorId(@PathVariable Long id) {
+        return service.buscarPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/administrador/editar/{id}")
-    public String atualizarAdmin(@PathVariable Long id, @ModelAttribute Usuario adminAtualizado) {
-        adminAtualizado.setId_usuario(id);
-        adminAtualizado.setPapel(Papel.ADMINISTRADOR);
-        service.salvar(adminAtualizado);
-        return "redirect:/admin/administradores";
-    }
+    // No AdminController.java
 
-    @GetMapping("/administrador/excluir/{id}")
-    public String excluirAdministrador(@PathVariable Long id) {
-        service.excluir(id);
-        return "redirect:/admin/administradores";
+    @DeleteMapping("/usuarios/{id}")
+    public ResponseEntity<Void> excluirUsuario(@PathVariable Long id) {
+        try {
+            service.excluir(id);
+            return ResponseEntity.noContent().build();
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (RuntimeException e) {
+            if ("error.user.not.found".equals(e.getMessage())) {
+                return ResponseEntity.notFound().build();
+            }
+            throw e;
+        }
     }
 }
