@@ -24,7 +24,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/admin/**").hasRole("ADMINISTRADOR")
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/testador/**").hasRole("ADMINISTRADOR")
+                        .anyRequest().permitAll()
                 )
                 .httpBasic(Customizer.withDefaults());
 

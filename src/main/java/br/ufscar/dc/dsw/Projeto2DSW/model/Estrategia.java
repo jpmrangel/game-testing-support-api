@@ -26,7 +26,7 @@ public class Estrategia {
     @OneToMany(mappedBy = "estrategia")
     private List<SessaoTeste> sessoes;
 
-    @OneToMany(mappedBy = "estrategia")
+    @OneToMany(mappedBy = "estrategia", cascade = CascadeType.PERSIST)
     private List<Imagem> imagens;
 
     public Long getId_estrategia() {

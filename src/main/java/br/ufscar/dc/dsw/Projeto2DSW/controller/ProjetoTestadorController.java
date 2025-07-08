@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @Controller
-@RequestMapping("/testador/projetos")
+@RequestMapping("/api/testador/projetos")
 public class ProjetoTestadorController {
 
     @Autowired
     ProjetoRepository projetoRepository;
 
-    @GetMapping("/listar-projetos")
+    @GetMapping("")
     public String listarProjetos(@AuthenticationPrincipal Usuario usuarioLogado,
                                  @RequestParam(defaultValue = "nome") String sortField,
                                  @RequestParam(defaultValue = "asc") String sortDir,

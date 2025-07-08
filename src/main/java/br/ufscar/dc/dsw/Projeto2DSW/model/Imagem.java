@@ -1,5 +1,6 @@
 package br.ufscar.dc.dsw.Projeto2DSW.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
@@ -13,6 +14,7 @@ public class Imagem {
 
     @ManyToOne
     @JoinColumn(name = "estrategia_id")
+    @JsonIgnoreProperties("imagens")
     private Estrategia estrategia;
 
     public Imagem() {}

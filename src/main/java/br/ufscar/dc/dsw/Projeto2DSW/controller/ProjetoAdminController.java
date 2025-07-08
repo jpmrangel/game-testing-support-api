@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin/projetos")
+@RequestMapping("/api/admin/projetos")
 public class ProjetoAdminController {
 
     @Autowired
