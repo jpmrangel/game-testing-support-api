@@ -6,100 +6,94 @@ import br.ufscar.dc.dsw.Projeto2DSW.repository.ProjetoRepository;
 import br.ufscar.dc.dsw.Projeto2DSW.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-@Controller
+@RestController
 @RequestMapping("/api/admin/projetos")
 public class ProjetoAdminController {
 
     @Autowired
     private ProjetoRepository projetoRepository;
+
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    @GetMapping("")
-    public String projetos() {
-        return "admin/projetos/projetos";
+    // GET /api/admin/projetos
+    @GetMapping
+    public ResponseEntity<List<Projeto>> listarProjetos() {
+        List<Projeto> projetos = projetoRepository.findAll();
+        return ResponseEntity.ok(projetos);
     }
 
-    @GetMapping("/listar-projetos")
-    public String listarProjetos(@RequestParam(defaultValue = "nome") String sortField,
-                                 @RequestParam(defaultValue = "asc") String sortDir,
-                                 Model model) {
-
-        List<String> camposPermitidos = List.of("nome", "dataCriacao");
-        if (!camposPermitidos.contains(sortField)) {
-            sortField = "nome";
-        }
-
-        Sort sort = sortDir.equalsIgnoreCase("asc")
-                ? Sort.by(sortField).ascending()
-                : Sort.by(sortField).descending();
-
-        model.addAttribute("projetos", projetoRepository.findAll(sort));
-        model.addAttribute("sortField", sortField);
-        model.addAttribute("sortDir", sortDir);
-        model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
-
-        return "admin/projetos/listar-projetos";
-    }
-
-    @GetMapping("/novo-projeto")
-    public String novoProjeto(Model model) {
-        model.addAttribute("projeto", new Projeto());
-        model.addAttribute("usuariosDisponiveis", usuarioRepository.findAll());
-        return "admin/projetos/novo-projeto";
-    }
-
-    @PostMapping("/novo-projeto")
-    public String novoProjeto(@ModelAttribute Projeto projeto, @RequestParam List<Long> usuarios) {
-        List<Usuario> usuariosDisponiveis = usuarioRepository.findAllById(usuarios);
-        projeto.setUsuarios(usuariosDisponiveis);
-
-        projetoRepository.save(projeto);
-        return "redirect:/admin/projetos/listar-projetos";
-    }
-
-    @GetMapping("/editar/{id}")
-    public String editarProjeto(@PathVariable("id") Long id, Model model) {
-        Projeto projeto = projetoRepository.findById(id).orElseThrow();
-        model.addAttribute("projeto", projeto);
-        model.addAttribute("usuariosDisponiveis", usuarioRepository.findAll());
-        return "admin/projetos/editar-projeto";
-    }
-
-    @PostMapping("/editar/{id}")
-    public String editarProjeto(@PathVariable Long id, Projeto projeto, @RequestParam(required = false) List<Long> usuarios) {
-        Projeto projetoOriginal = projetoRepository.findById(id).orElseThrow();
-
-        projetoOriginal.setNome(projeto.getNome());
-        projetoOriginal.setDescricao(projeto.getDescricao());
-
-        if(usuarios != null) {
-            List<Usuario> usuariosDisponiveis = usuarioRepository.findAllById(usuarios);
-            projetoOriginal.setUsuarios(usuariosDisponiveis);
+    // GET /api/admin/projetos/{id}
+    @GetMapping("/{id}")
+    public ResponseEntity<Projeto> buscarProjeto(@PathVariable Long id) {
+        Optional<Projeto> projetoOpt = projetoRepository.findById(id);
+        if (projetoOpt.isPresent()) {
+            return ResponseEntity.ok(projetoOpt.get());
         } else {
-            projetoOriginal.setUsuarios(new ArrayList<>());
+            return ResponseEntity.notFound().build();
         }
-
-        projetoRepository.save(projetoOriginal);
-        return "redirect:/admin/projetos/listar-projetos";
     }
 
-    @PostMapping("/excluir/{id}")
-    public String excluirProjeto(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    private void pegarIds(Projeto projeto) {
+        List<Long> ids = new ArrayList<>();
+        for (Usuario usuario : projeto.getUsuarios()) {
+            ids.add(usuario.getId_usuario());
+        }
+        List<Usuario> usuarios = usuarioRepository.findAllById(ids);
+        projeto.setUsuarios(usuarios);
+    }
+
+    // POST /api/admin/projetos
+    @PostMapping
+    public ResponseEntity<Projeto> criarProjeto(@RequestBody Projeto projeto) {
+        if (projeto.getUsuarios() != null) {
+            pegarIds(projeto);
+        }
+
+        Projeto salvo = projetoRepository.save(projeto);
+        return ResponseEntity.status(201).body(salvo);
+    }
+
+    // PUT /api/admin/projetos/{id}
+    @PutMapping("/{id}")
+    public ResponseEntity<Projeto> atualizarProjeto(@PathVariable Long id, @RequestBody Projeto projetoAtualizado) {
+        Optional<Projeto> optionalProjeto = projetoRepository.findById(id);
+        if (optionalProjeto.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Projeto projeto = optionalProjeto.get();
+        projeto.setNome(projetoAtualizado.getNome());
+        projeto.setDescricao(projetoAtualizado.getDescricao());
+
+        if (projetoAtualizado.getUsuarios() != null) {
+            pegarIds(projetoAtualizado);
+            projeto.setUsuarios(projetoAtualizado.getUsuarios());
+        } else {
+            projeto.setUsuarios(new ArrayList<>());
+        }
+
+        Projeto salvo = projetoRepository.save(projeto);
+        return ResponseEntity.ok(salvo);
+    }
+
+    // DELETE /api/admin/projetos/{id}
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluirProjeto(@PathVariable Long id) {
+        if (!projetoRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
         try {
             projetoRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
         } catch (DataIntegrityViolationException e) {
-            redirectAttributes.addFlashAttribute("erroExclusao", true);
+            return ResponseEntity.status(409).build();
         }
-        return "redirect:/admin/projetos/listar-projetos";
     }
 }

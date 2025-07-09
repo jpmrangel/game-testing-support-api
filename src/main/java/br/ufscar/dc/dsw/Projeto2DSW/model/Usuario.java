@@ -1,5 +1,6 @@
 package br.ufscar.dc.dsw.Projeto2DSW.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,6 +40,7 @@ public class Usuario implements UserDetails {
     private List<SessaoTeste> sessoes;
 
     @ManyToMany(mappedBy = "usuarios")
+    @JsonIgnoreProperties("usuarios")
     private List<Projeto> projetos;
 
     @JsonProperty("id_usuario")
