@@ -1,18 +1,25 @@
 package br.ufscar.dc.dsw.Projeto2DSW.controller;
 
+import br.ufscar.dc.dsw.Projeto2DSW.dto.ProjetoDTO;
 import br.ufscar.dc.dsw.Projeto2DSW.model.Projeto;
 import br.ufscar.dc.dsw.Projeto2DSW.model.Usuario;
 import br.ufscar.dc.dsw.Projeto2DSW.repository.ProjetoRepository;
 import br.ufscar.dc.dsw.Projeto2DSW.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/projetos")
+@PreAuthorize("hasRole('ADMIN')")
 public class ProjetoAdminController {
 
     @Autowired
@@ -26,6 +33,31 @@ public class ProjetoAdminController {
     public ResponseEntity<List<Projeto>> listarProjetos() {
         List<Projeto> projetos = projetoRepository.findAll();
         return ResponseEntity.ok(projetos);
+    }
+
+    // GET /api/admin/projetos/ordenados
+    @GetMapping("/ordenados")
+    public ResponseEntity<List<ProjetoDTO>> listarProjetosOrdenados(
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) String direction) {
+
+        Sort.Direction sortDirection = Sort.Direction.ASC;
+        if (direction != null && direction.equalsIgnoreCase("desc")) {
+            sortDirection = Sort.Direction.DESC;
+        }
+
+        Sort sortBy = sort != null ?
+                (sort.equalsIgnoreCase("nome") ? Sort.by(sortDirection, "nome") :
+                        sort.equalsIgnoreCase("data") ? Sort.by(sortDirection, "dataCriacao") :
+                                Sort.by(Sort.Direction.ASC, "nome")) :
+                Sort.by(Sort.Direction.ASC, "nome");
+
+        List<Projeto> projetos = projetoRepository.findAll(sortBy);
+        List<ProjetoDTO> projetosDTO = projetos.stream()
+                .map(ProjetoDTO::new)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(projetosDTO);
     }
 
     // GET /api/admin/projetos/{id}
