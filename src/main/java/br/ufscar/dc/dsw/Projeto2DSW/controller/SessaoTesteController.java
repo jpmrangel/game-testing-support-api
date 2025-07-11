@@ -1,16 +1,12 @@
 package br.ufscar.dc.dsw.Projeto2DSW.controller;
 
-import br.ufscar.dc.dsw.Projeto2DSW.model.Bug;
-import br.ufscar.dc.dsw.Projeto2DSW.model.Projeto;
-import br.ufscar.dc.dsw.Projeto2DSW.model.SessaoTeste;
-import br.ufscar.dc.dsw.Projeto2DSW.model.Status;
-import br.ufscar.dc.dsw.Projeto2DSW.model.Usuario;
-import br.ufscar.dc.dsw.Projeto2DSW.repository.BugRepository;
-import br.ufscar.dc.dsw.Projeto2DSW.repository.EstrategiaRepository;
-import br.ufscar.dc.dsw.Projeto2DSW.repository.ProjetoRepository;
-import br.ufscar.dc.dsw.Projeto2DSW.repository.SessaoTesteRepository;
-import jakarta.validation.Valid;
+import br.ufscar.dc.dsw.Projeto2DSW.dto.SessaoCreateDTO;
+import br.ufscar.dc.dsw.Projeto2DSW.dto.SessaoResponseDTO;
+import br.ufscar.dc.dsw.Projeto2DSW.model.*;
+import br.ufscar.dc.dsw.Projeto2DSW.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,11 +14,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
 @Controller
-@RequestMapping("/testador/sessoes")
+@RestController
+@RequestMapping(value = {"/testador/sessoes", "/api/testador/sessoes"})
 public class SessaoTesteController {
 
     @Autowired
@@ -48,7 +46,7 @@ public class SessaoTesteController {
     }
 
     @PostMapping("/nova")
-    public String salvarSessao(@ModelAttribute @Valid SessaoTeste sessao,
+    public String salvarSessao(@ModelAttribute SessaoTeste sessao,
                                @AuthenticationPrincipal Usuario usuarioLogado) {
         sessao.setUsuario(usuarioLogado);
         sessao.setNome_testador(usuarioLogado.getNome());
@@ -69,13 +67,12 @@ public class SessaoTesteController {
     @GetMapping("/iniciar/{id}")
     public String iniciarSessao(@PathVariable Long id, Model model) {
         SessaoTeste sessao = sessaoTesteRepository.findById(id).orElseThrow();
-        
+
         if (sessao.getStatus() == Status.CRIADO) {
             sessao.setStatus(Status.EM_EXECUCAO);
             sessao.setData_inicio(new Timestamp(System.currentTimeMillis()));
             sessaoTesteRepository.save(sessao);
-            
-            // Configura timer para finalização automática
+
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
@@ -87,22 +84,22 @@ public class SessaoTesteController {
                         sessaoTesteRepository.save(sessaoAtualizada);
                     }
                 }
-            }, sessao.getTempo() * 60 * 1000); // Converte minutos para milissegundos
+            }, sessao.getTempo() * 60 * 1000);
         }
-        
+
         return "redirect:/testador/sessoes/detalhes/" + id;
     }
 
     @GetMapping("/finalizar/{id}")
     public String finalizarSessao(@PathVariable Long id) {
         SessaoTeste sessao = sessaoTesteRepository.findById(id).orElseThrow();
-        
+
         if (sessao.getStatus() == Status.EM_EXECUCAO) {
             sessao.setStatus(Status.FINALIZADO);
             sessao.setData_fim(new Timestamp(System.currentTimeMillis()));
             sessaoTesteRepository.save(sessao);
         }
-        
+
         return "redirect:/testador/sessoes/listar-sessoes";
     }
 
@@ -115,7 +112,6 @@ public class SessaoTesteController {
         model.addAttribute("bugs", bugs);
         model.addAttribute("novoBug", new Bug());
 
-        // Adicionar timestamp de início se disponível
         if(sessao.getData_inicio() != null) {
             model.addAttribute("dataInicioTimestamp", sessao.getData_inicio().getTime());
         }
@@ -124,16 +120,43 @@ public class SessaoTesteController {
     }
 
     @PostMapping("/reportar-bug/{id}")
-    public String reportarBug(@PathVariable Long id, 
-                            @ModelAttribute("novoBug") Bug bug,
-                            @AuthenticationPrincipal Usuario usuarioLogado) {
+    public String reportarBug(@PathVariable Long id,
+                              @ModelAttribute("novoBug") Bug bug,
+                              @AuthenticationPrincipal Usuario usuarioLogado) {
         SessaoTeste sessao = sessaoTesteRepository.findById(id).orElseThrow();
-        
+
         if (sessao.getStatus() == Status.EM_EXECUCAO) {
             bug.setSessao(sessao);
             bugRepository.save(bug);
         }
-        
+
         return "redirect:/testador/sessoes/detalhes/" + id;
+    }
+
+    @PostMapping(consumes = "application/json", produces = "application/json")
+    @PreAuthorize("hasRole('TESTADOR')")
+    public ResponseEntity<SessaoResponseDTO> criarSessaoRest(
+            @RequestBody SessaoCreateDTO sessaoDTO,
+            @AuthenticationPrincipal Usuario usuarioLogado) {
+
+        Optional<Projeto> projetoOpt = projetoRepository.findById(sessaoDTO.getProjetoId());
+        Optional<Estrategia> estrategiaOpt = estrategiaRepository.findById(sessaoDTO.getEstrategiaId());
+
+        if (projetoOpt.isEmpty() || estrategiaOpt.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        SessaoTeste sessao = new SessaoTeste();
+        sessao.setProjeto(projetoOpt.get());
+        sessao.setEstrategia(estrategiaOpt.get());
+        sessao.setTempo(sessaoDTO.getTempo());
+        sessao.setDescricao(sessaoDTO.getDescricao());
+        sessao.setUsuario(usuarioLogado);
+        sessao.setNome_testador(usuarioLogado.getNome());
+        sessao.setStatus(Status.CRIADO);
+        sessao.setData_criacao(new Timestamp(System.currentTimeMillis()));
+
+        SessaoTeste sessaoSalva = sessaoTesteRepository.save(sessao);
+        return ResponseEntity.status(201).body(new SessaoResponseDTO(sessaoSalva));
     }
 }
