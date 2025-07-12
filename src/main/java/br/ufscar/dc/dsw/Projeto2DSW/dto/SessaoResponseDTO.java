@@ -8,15 +8,12 @@ import java.sql.Timestamp;
 public class SessaoResponseDTO {
     private Long idSessao;
     private String nomeTestador;
-    private String estrategiaNome;  // Nome da estratégia em vez do objeto
-    private Integer tempo;
+    private String projetoNome;
+    private String estrategiaNome;
     private String descricao;
+    private Integer tempo;
     private Status status;
     private Timestamp dataCriacao;
-    private Timestamp dataInicio;
-    private Timestamp dataFim;
-    private Long projetoId;
-    private String projetoNome;
 
     public SessaoResponseDTO(SessaoTeste sessao) {
         this.idSessao = sessao.getIdSessao();
@@ -26,24 +23,15 @@ public class SessaoResponseDTO {
         this.descricao = sessao.getDescricao();
         this.status = sessao.getStatus();
         this.dataCriacao = sessao.getData_criacao();
-        this.dataInicio = sessao.getData_inicio();
-        this.dataFim = sessao.getData_fim();
-        if (sessao.getProjeto() != null) {
-            this.projetoId = sessao.getProjeto().getId_projeto();
-            this.projetoNome = sessao.getProjeto().getNome();
-        }
     }
 
     // Getters
     public Long getIdSessao() { return idSessao; }
     public String getNomeTestador() { return nomeTestador; }
+    public String getProjetoNome() { return projetoNome; }
     public String getEstrategiaNome() { return estrategiaNome; }
-    public Integer getTempo() { return tempo; }
     public String getDescricao() { return descricao; }
+    public Integer getTempo() { return tempo; }
     public Status getStatus() { return status; }
     public Timestamp getDataCriacao() { return dataCriacao; }
-    public Timestamp getDataInicio() { return dataInicio; }
-    public Timestamp getDataFim() { return dataFim; }
-    public Long getProjetoId() { return projetoId; }
-    public String getProjetoNome() { return projetoNome; }
 }
