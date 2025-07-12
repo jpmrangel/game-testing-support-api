@@ -2,7 +2,7 @@ package br.ufscar.dc.dsw.Projeto2DSW.dto;
 
 public class SessaoCreateDTO {
     private Long projetoId;
-    private Long estrategiaId;  // Agora usando ID em vez de String
+    private Long estrategiaId;
     private Integer tempo;
     private String descricao;
 
