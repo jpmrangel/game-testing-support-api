@@ -1,9 +1,8 @@
 package br.ufscar.dc.dsw.Projeto2DSW.controller;
 
 import br.ufscar.dc.dsw.Projeto2DSW.dto.ProjetoDTO;
-import br.ufscar.dc.dsw.Projeto2DSW.model.Projeto;
 import br.ufscar.dc.dsw.Projeto2DSW.model.Usuario;
-import br.ufscar.dc.dsw.Projeto2DSW.repository.ProjetoRepository;
+import br.ufscar.dc.dsw.Projeto2DSW.service.ProjetoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
 public class ProjetoTestadorController {
 
     @Autowired
-    ProjetoRepository projetoRepository;
+    private ProjetoService service;
 
     @GetMapping
     public ResponseEntity<List<ProjetoDTO>> listarProjetos(
@@ -29,18 +28,8 @@ public class ProjetoTestadorController {
             @RequestParam(defaultValue = "nome") String sortField,
             @RequestParam(defaultValue = "asc") String sortDir) {
 
-        List<String> camposPermitidos = List.of("nome", "dataCriacao");
-        if (!camposPermitidos.contains(sortField)) {
-            sortField = "nome";
-        }
-
-        Sort sort = sortDir.equalsIgnoreCase("asc")
-                ? Sort.by(sortField).ascending()
-                : Sort.by(sortField).descending();
-
-        List<Projeto> projetos = projetoRepository.findByUsuarios_IdUsuario(usuarioLogado.getId_usuario(), sort);
-
-        List<ProjetoDTO> projetosDTO = projetos.stream()
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
+        List<ProjetoDTO> projetosDTO = service.listarPorUsuario(usuarioLogado.getId_usuario(), sort).stream()
                 .map(ProjetoDTO::new)
                 .collect(Collectors.toList());
 
