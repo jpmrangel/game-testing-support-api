@@ -1,5 +1,6 @@
 package br.ufscar.dc.dsw.Projeto2DSW.controller;
 
+import br.ufscar.dc.dsw.Projeto2DSW.dto.EstrategiaDTO;
 import br.ufscar.dc.dsw.Projeto2DSW.model.Estrategia;
 import br.ufscar.dc.dsw.Projeto2DSW.model.Imagem;
 import br.ufscar.dc.dsw.Projeto2DSW.repository.EstrategiaRepository;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/estrategias")
@@ -21,54 +23,49 @@ public class EstrategiaAdminController {
     @Autowired
     private ImagemRepository imagemRepository;
 
-    // GET /api/admin/estrategias
     @GetMapping
-    public ResponseEntity<List<Estrategia>> listarEstrategias() {
-        List<Estrategia> lista = estrategiaRepository.findAll();
-        return ResponseEntity.ok(lista);
+    public ResponseEntity<List<EstrategiaDTO>> listarEstrategias() {
+        List<Estrategia> estrategias = estrategiaRepository.findAll();
+        List<EstrategiaDTO> estrategiaDTOs = estrategias.stream()
+                .map(EstrategiaDTO::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(estrategiaDTOs);
     }
 
-    // GET /api/admin/estrategias/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<Estrategia> buscarEstrategiaPorId(@PathVariable Long id) {
-        Optional<Estrategia> estrategiaOpt = estrategiaRepository.findById(id);
-        if (estrategiaOpt.isPresent()) {
-            return ResponseEntity.ok(estrategiaOpt.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<EstrategiaDTO> buscarEstrategiaPorId(@PathVariable Long id) {
+        return estrategiaRepository.findById(id)
+                .map(estrategia -> ResponseEntity.ok(new EstrategiaDTO(estrategia)))
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // POST /api/admin/estrategias
     @PostMapping
-    public ResponseEntity<Estrategia> criarEstrategia(@RequestBody Estrategia estrategia) {
+    public ResponseEntity<EstrategiaDTO> criarEstrategia(@RequestBody Estrategia estrategia) {
         if (estrategia.getImagens() != null) {
             for (Imagem imagem : estrategia.getImagens()) {
                 imagem.setEstrategia(estrategia);
             }
         }
         Estrategia salva = estrategiaRepository.save(estrategia);
-        return ResponseEntity.status(201).body(salva);
+        EstrategiaDTO salvaDTO = new EstrategiaDTO(salva);
+        return ResponseEntity.status(201).body(salvaDTO);
     }
 
-    // PUT /api/admin/estrategias/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<Estrategia> editarEstrategia(@PathVariable Long id, @RequestBody Estrategia estrategiaAtualizada) {
-        Optional<Estrategia> estrategiaOpt = estrategiaRepository.findById(id);
-        if (estrategiaOpt.isPresent()) {
-            Estrategia estrategia = estrategiaOpt.get();
-            estrategia.setNome(estrategiaAtualizada.getNome());
-            estrategia.setDescricao(estrategiaAtualizada.getDescricao());
-            estrategia.setExemplo(estrategiaAtualizada.getExemplo());
-            estrategia.setDica(estrategiaAtualizada.getDica());
-            Estrategia salva = estrategiaRepository.save(estrategia);
-            return ResponseEntity.ok(salva);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<EstrategiaDTO> editarEstrategia(@PathVariable Long id, @RequestBody Estrategia estrategiaAtualizada) {
+        return estrategiaRepository.findById(id)
+                .map(estrategia -> {
+                    estrategia.setNome(estrategiaAtualizada.getNome());
+                    estrategia.setDescricao(estrategiaAtualizada.getDescricao());
+                    estrategia.setExemplo(estrategiaAtualizada.getExemplo());
+                    estrategia.setDica(estrategiaAtualizada.getDica());
+                    
+                    Estrategia salva = estrategiaRepository.save(estrategia);
+                    return ResponseEntity.ok(new EstrategiaDTO(salva));
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE /api/admin/estrategias/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirEstrategia(@PathVariable Long id) {
         Optional<Estrategia> estrategiaOpt = estrategiaRepository.findById(id);

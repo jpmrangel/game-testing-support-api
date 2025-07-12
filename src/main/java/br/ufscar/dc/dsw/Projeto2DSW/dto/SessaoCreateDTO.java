@@ -6,7 +6,6 @@ public class SessaoCreateDTO {
     private Integer tempo;
     private String descricao;
 
-    // Getters e Setters
     public Long getProjetoId() { return projetoId; }
     public void setProjetoId(Long projetoId) { this.projetoId = projetoId; }
     public Long getEstrategiaId() { return estrategiaId; }
