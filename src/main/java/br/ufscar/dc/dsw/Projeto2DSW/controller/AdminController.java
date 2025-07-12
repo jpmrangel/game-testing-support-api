@@ -1,8 +1,12 @@
 package br.ufscar.dc.dsw.Projeto2DSW.controller;
 
+import br.ufscar.dc.dsw.Projeto2DSW.dto.UsuarioCreateDTO;
+import br.ufscar.dc.dsw.Projeto2DSW.dto.UsuarioResponseDTO;
 import br.ufscar.dc.dsw.Projeto2DSW.model.Papel;
 import br.ufscar.dc.dsw.Projeto2DSW.model.Usuario;
 import br.ufscar.dc.dsw.Projeto2DSW.service.UserService;
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -13,6 +17,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -23,88 +28,110 @@ public class AdminController {
 
 
     @GetMapping("/testadores")
-    public ResponseEntity<List<Usuario>> listarTestadores() {
+    public ResponseEntity<List<UsuarioResponseDTO>> listarTestadores() {
         List<Usuario> testadores = service.listarPorPapel(Papel.TESTADOR);
-        return ResponseEntity.ok(testadores);
+        List<UsuarioResponseDTO> testadoresDTOs = testadores.stream()
+                .map(UsuarioResponseDTO::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(testadoresDTOs);
     }
 
     @PostMapping("/testadores")
-    public ResponseEntity<Usuario> criarTestador(@RequestBody Usuario usuario) {
+    public ResponseEntity<UsuarioResponseDTO> criarTestador(@Valid @RequestBody UsuarioCreateDTO dto) {
         try {
+            Usuario usuario = new Usuario();
+            usuario.setNome(dto.getNome());
+            usuario.setEmail(dto.getEmail());
+            usuario.setSenha(dto.getSenha());
             usuario.setPapel(Papel.TESTADOR);
+            
             Usuario novoUsuario = service.salvar(usuario);
 
             URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                     .buildAndExpand(novoUsuario.getId_usuario()).toUri();
 
-            return ResponseEntity.created(location).body(novoUsuario);
+            return ResponseEntity.created(location).body(new UsuarioResponseDTO(novoUsuario));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 
     @PutMapping("/testadores/{id}")
-    public ResponseEntity<Usuario> atualizarTestador(@PathVariable Long id, @RequestBody Usuario usuario) {
-        return service.buscarPorId(id)
+    public ResponseEntity<UsuarioResponseDTO> atualizarTestador(@PathVariable Long id, @Valid @RequestBody UsuarioCreateDTO dto) {
+        try {
+            return service.buscarPorId(id)
                 .map(existingUser -> {
-                    usuario.setId_usuario(id);
-                    usuario.setPapel(Papel.TESTADOR);
-                    Usuario usuarioAtualizado = service.salvar(usuario);
-                    return ResponseEntity.ok(usuarioAtualizado);
+                    existingUser.setNome(dto.getNome());
+                    existingUser.setEmail(dto.getEmail());
+                    if (dto.getSenha() != null && !dto.getSenha().isEmpty()) {
+                        existingUser.setSenha(dto.getSenha());
+                    }
+                    existingUser.setPapel(Papel.TESTADOR);
+
+                    Usuario usuarioAtualizado = service.salvar(existingUser);
+                    return ResponseEntity.ok(new UsuarioResponseDTO(usuarioAtualizado));
                 })
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.notFound().build()); 
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 
     @GetMapping("/administradores")
-    public ResponseEntity<List<Usuario>> listarAdministradores() {
+    public ResponseEntity<List<UsuarioResponseDTO>> listarAdministradores() {
         List<Usuario> administradores = service.listarPorPapel(Papel.ADMINISTRADOR);
-        return ResponseEntity.ok(administradores);
+        List<UsuarioResponseDTO> administradoresDTO = administradores.stream()
+                .map(UsuarioResponseDTO::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(administradoresDTO);
     }
 
     @PostMapping("/administradores")
-    public ResponseEntity<Usuario> criarAdministrador(@RequestBody Usuario usuario) {
+    public ResponseEntity<UsuarioResponseDTO> criarAdministrador(@Valid @RequestBody UsuarioCreateDTO dto) {
         try {
+            Usuario usuario = new Usuario();
+            usuario.setNome(dto.getNome());
+            usuario.setEmail(dto.getEmail());
+            usuario.setSenha(dto.getSenha());
             usuario.setPapel(Papel.ADMINISTRADOR);
+            
             Usuario novoAdmin = service.salvar(usuario);
 
             URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                     .buildAndExpand(novoAdmin.getId_usuario()).toUri();
 
-            return ResponseEntity.created(location).body(novoAdmin);
+            return ResponseEntity.created(location).body(new UsuarioResponseDTO(novoAdmin));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 
     @PutMapping("/administradores/{id}")
-    public ResponseEntity<?> atualizarAdmin(@PathVariable Long id, @RequestBody Usuario adminAtualizado) {
-        // Primeiro, verifica se o administrador a ser atualizado existe
-        return service.buscarPorId(id)
+    public ResponseEntity<UsuarioResponseDTO> atualizarAdmin(@PathVariable Long id,  @Valid @RequestBody UsuarioCreateDTO dto) {
+        try {
+            return service.buscarPorId(id)
                 .map(existingAdmin -> {
-                    adminAtualizado.setId_usuario(id);
-                    adminAtualizado.setPapel(Papel.ADMINISTRADOR);
-
-                    try {
-                        Usuario usuarioAtualizado = service.salvar(adminAtualizado);
-                        return ResponseEntity.ok(usuarioAtualizado);
-                    } catch (DataIntegrityViolationException e) {
-
-                        return ResponseEntity
-                                .status(HttpStatus.CONFLICT)
-                                .body("Erro: O e-mail informado já está em uso por outro usuário.");
+                    existingAdmin.setNome(dto.getNome());
+                    existingAdmin.setEmail(dto.getEmail());
+                    if (dto.getSenha() != null && !dto.getSenha().isEmpty()) {
+                        existingAdmin.setSenha(dto.getSenha());
                     }
+                    existingAdmin.setPapel(Papel.ADMINISTRADOR);
+                    Usuario usuarioAtualizado = service.salvar(existingAdmin);
+                    return ResponseEntity.ok(new UsuarioResponseDTO(usuarioAtualizado));
                 })
                 .orElse(ResponseEntity.notFound().build());
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 
     @GetMapping("/usuarios/{id}")
-    public ResponseEntity<Usuario> getUsuarioPorId(@PathVariable Long id) {
+    public ResponseEntity<UsuarioResponseDTO> getUsuarioPorId(@PathVariable Long id) {
         return service.buscarPorId(id)
-                .map(ResponseEntity::ok)
+                .map(usuario -> ResponseEntity.ok(new UsuarioResponseDTO(usuario)))
                 .orElse(ResponseEntity.notFound().build());
     }
-
-    // No AdminController.java
 
     @DeleteMapping("/usuarios/{id}")
     public ResponseEntity<Void> excluirUsuario(@PathVariable Long id) {

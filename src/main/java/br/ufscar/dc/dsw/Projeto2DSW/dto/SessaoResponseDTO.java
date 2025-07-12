@@ -18,6 +18,7 @@ public class SessaoResponseDTO {
     public SessaoResponseDTO(SessaoTeste sessao) {
         this.idSessao = sessao.getIdSessao();
         this.nomeTestador = sessao.getNome_testador();
+        this.projetoNome = sessao.getProjeto() != null ? sessao.getProjeto().getNome() : null;
         this.estrategiaNome = sessao.getEstrategia() != null ? sessao.getEstrategia().getNome() : null;
         this.tempo = sessao.getTempo();
         this.descricao = sessao.getDescricao();

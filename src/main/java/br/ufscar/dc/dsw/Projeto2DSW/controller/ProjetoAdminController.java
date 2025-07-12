@@ -1,10 +1,13 @@
 package br.ufscar.dc.dsw.Projeto2DSW.controller;
 
+import br.ufscar.dc.dsw.Projeto2DSW.dto.ProjetoCreateDTO;
 import br.ufscar.dc.dsw.Projeto2DSW.dto.ProjetoDTO;
 import br.ufscar.dc.dsw.Projeto2DSW.model.Projeto;
 import br.ufscar.dc.dsw.Projeto2DSW.model.Usuario;
 import br.ufscar.dc.dsw.Projeto2DSW.repository.ProjetoRepository;
 import br.ufscar.dc.dsw.Projeto2DSW.repository.UsuarioRepository;
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
@@ -14,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -28,23 +30,21 @@ public class ProjetoAdminController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    // GET /api/admin/projetos
     @GetMapping
-    public ResponseEntity<List<Projeto>> listarProjetos() {
+    public ResponseEntity<List<ProjetoDTO>> listarProjetos() {
         List<Projeto> projetos = projetoRepository.findAll();
-        return ResponseEntity.ok(projetos);
+        List<ProjetoDTO> projetosDTO = projetos.stream()
+            .map(ProjetoDTO::new)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(projetosDTO);
     }
 
-    // GET /api/admin/projetos/ordenados
     @GetMapping("/ordenados")
     public ResponseEntity<List<ProjetoDTO>> listarProjetosOrdenados(
             @RequestParam(required = false) String sort,
             @RequestParam(required = false) String direction) {
 
-        Sort.Direction sortDirection = Sort.Direction.ASC;
-        if (direction != null && direction.equalsIgnoreCase("desc")) {
-            sortDirection = Sort.Direction.DESC;
-        }
+        Sort.Direction sortDirection = "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
 
         Sort sortBy = sort != null ?
                 (sort.equalsIgnoreCase("nome") ? Sort.by(sortDirection, "nome") :
@@ -60,61 +60,50 @@ public class ProjetoAdminController {
         return ResponseEntity.ok(projetosDTO);
     }
 
-    // GET /api/admin/projetos/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<Projeto> buscarProjeto(@PathVariable Long id) {
-        Optional<Projeto> projetoOpt = projetoRepository.findById(id);
-        if (projetoOpt.isPresent()) {
-            return ResponseEntity.ok(projetoOpt.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ProjetoDTO> buscarProjeto(@PathVariable Long id) {
+        return projetoRepository.findById(id)
+            .map(projeto -> ResponseEntity.ok(new ProjetoDTO(projeto)))
+            .orElse(ResponseEntity.badRequest().build());
     }
 
-    private void pegarIds(Projeto projeto) {
-        List<Long> ids = new ArrayList<>();
-        for (Usuario usuario : projeto.getUsuarios()) {
-            ids.add(usuario.getId_usuario());
-        }
-        List<Usuario> usuarios = usuarioRepository.findAllById(ids);
-        projeto.setUsuarios(usuarios);
-    }
-
-    // POST /api/admin/projetos
     @PostMapping
-    public ResponseEntity<Projeto> criarProjeto(@RequestBody Projeto projeto) {
-        if (projeto.getUsuarios() != null) {
-            pegarIds(projeto);
+    public ResponseEntity<ProjetoDTO> criarProjeto(@Valid @RequestBody ProjetoCreateDTO dto) {
+        Projeto projeto = new Projeto();
+        projeto.setNome(dto.getNome());
+        projeto.setDescricao(dto.getDescricao());
+
+        if (dto.getMembrosIds() != null && !dto.getMembrosIds().isEmpty()) {
+            List<Usuario> usuarios = usuarioRepository.findAllById(dto.getMembrosIds());
+            projeto.setUsuarios(usuarios);
         }
 
         Projeto salvo = projetoRepository.save(projeto);
-        return ResponseEntity.status(201).body(salvo);
+        return ResponseEntity.status(201).body(new ProjetoDTO(salvo));
     }
 
-    // PUT /api/admin/projetos/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<Projeto> atualizarProjeto(@PathVariable Long id, @RequestBody Projeto projetoAtualizado) {
-        Optional<Projeto> optionalProjeto = projetoRepository.findById(id);
-        if (optionalProjeto.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ProjetoDTO> atualizarProjeto(@PathVariable Long id, @Valid @RequestBody ProjetoCreateDTO dto) {
+        return projetoRepository.findById(id)
+            .map(projeto -> {
+                projeto.setNome(dto.getNome());
+                projeto.setDescricao(dto.getDescricao());
 
-        Projeto projeto = optionalProjeto.get();
-        projeto.setNome(projetoAtualizado.getNome());
-        projeto.setDescricao(projetoAtualizado.getDescricao());
+                if (dto.getMembrosIds() != null) {
+                    if (dto.getMembrosIds().isEmpty()) {
+                        projeto.setUsuarios(new ArrayList<>());
+                    } else {
+                        List<Usuario> usuarios = usuarioRepository.findAllById(dto.getMembrosIds());
+                        projeto.setUsuarios(usuarios);
+                    }
+                }
 
-        if (projetoAtualizado.getUsuarios() != null) {
-            pegarIds(projetoAtualizado);
-            projeto.setUsuarios(projetoAtualizado.getUsuarios());
-        } else {
-            projeto.setUsuarios(new ArrayList<>());
-        }
-
-        Projeto salvo = projetoRepository.save(projeto);
-        return ResponseEntity.ok(salvo);
+                Projeto salvo = projetoRepository.save(projeto);
+                return ResponseEntity.ok(new ProjetoDTO(salvo));
+            })
+            .orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE /api/admin/projetos/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirProjeto(@PathVariable Long id) {
         if (!projetoRepository.existsById(id)) {
