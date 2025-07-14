@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,8 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/sessoes")
-@PreAuthorize("hasAnyRole('TESTADOR', 'ADMINISTRADOR')")
+@RequestMapping("/api/testador/sessoes")
 public class SessaoTesteController {
 
     @Autowired
@@ -37,7 +35,6 @@ public class SessaoTesteController {
     }
     
     @PostMapping
-    @PreAuthorize("hasRole('TESTADOR')")
     public ResponseEntity<SessaoResponseDTO> criarSessao(
             @Valid @RequestBody SessaoCreateDTO sessaoDTO,
             @AuthenticationPrincipal Usuario usuarioLogado) {
